@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import MyContext from '../contexts/MyContext';
 
 class Menu extends Component {
@@ -8,25 +8,22 @@ class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // Dùng state để ép Menu render lại khi click
       activePath: window.location.pathname
     };
   }
 
-  // Cập nhật lại state khi người dùng nhấn vào các mục menu
   handleItemClick(path) {
     this.setState({ activePath: path });
   }
 
-  // 👉 THÊM MỚI: tự cập nhật khi URL thay đổi (fix lỗi không active đúng)
   componentDidUpdate(prevProps, prevState) {
+    // Sửa lỗi vòng lặp vô hạn
     if (window.location.pathname !== this.state.activePath) {
       this.setState({ activePath: window.location.pathname });
     }
   }
 
   render() {
-    // Ưu tiên lấy đường dẫn từ state để hiển thị màu ngay lập tức
     const currentPath = this.state.activePath;
 
     const menuItems = [
@@ -57,23 +54,15 @@ class Menu extends Component {
           }
 
           .logo-admin {
-            font-weight: 900;
-            font-size: 18px;
+            font-weight: 900; /* Cực đậm cho Logo */
+            font-size: 20px;
             color: #d32f2f;
             display: flex;
             align-items: center;
             gap: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            min-width: 250px;
-          }
-
-          .logo-admin span {
-            background: #d32f2f;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 14px;
+            text-decoration: none;
           }
 
           .menu-wrapper {
@@ -89,88 +78,81 @@ class Menu extends Component {
             display: flex;
             margin: 0;
             padding: 0;
-            gap: 12px;
-          }
-
-          li.menu {
-            position: relative;
+            gap: 8px;
           }
 
           li.menu a {
             text-decoration: none;
-            color: #555;
-            font-weight: 700;
-            font-size: 13px;
-            padding: 10px 22px;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #333;
+            font-weight: 800; /* Tăng độ đậm cho chữ Menu */
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
             text-transform: uppercase;
-            display: block;
           }
 
           li.menu a.active-link {
             background: linear-gradient(135deg, #ff9f43 0%, #d32f2f 100%);
             color: white !important;
-            box-shadow: 0 6px 15px rgba(211, 47, 47, 0.3);
-            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(211, 47, 47, 0.3);
           }
 
           li.menu a:hover:not(.active-link) {
             color: #d32f2f;
-            background: #fff5f5;
-            transform: translateY(-1px);
+            background: #fff0f0;
           }
 
           .user-profile-section {
             display: flex;
             align-items: center;
-            background: #fffaf5;
-            padding: 6px 15px;
-            border-radius: 15px;
-            border: 1px solid #ffe8d6;
+            background: #fff5ee;
+            padding: 8px 18px;
+            border-radius: 12px;
+            border: 1px solid #ffd8b1;
             gap: 15px;
-          }
-
-          .user-greeting {
-            font-size: 13px;
-            color: #444;
           }
 
           .user-name-highlight {
             color: #d32f2f;
-            font-weight: 800;
+            font-weight: 900; /* In đậm tên quản trị viên */
             text-decoration: underline;
-            text-underline-offset: 4px;
           }
 
           .logout-btn {
             text-decoration: none;
             color: white;
-            background: #333;
-            padding: 8px 15px;
-            border-radius: 10px;
+            background: #222;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 12px;
-            font-weight: 800;
-            transition: 0.3s;
+            font-weight: 900; /* In đậm nút đăng xuất */
             text-transform: uppercase;
+            transition: 0.3s;
           }
 
           .logout-btn:hover {
             background: #d32f2f;
-            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
           }
+          
+          .nav-logo-text { font-weight: 900; line-height: 1; }
+          .nav-logo-sub { font-size: 11px; font-weight: 700; color: #666; }
         `}</style>
 
-        <div className="logo-admin">
-          <span>K-FOOD</span> KOREA FOOD ADMIN
-        </div>
+        <NavLink to="/admin/home" className="logo-admin">
+          <span style={{ fontSize: '27px' }}>🍜</span>
+          <div>
+            <div className="nav-logo-text">KOREA FOOD</div>
+            <div className="nav-logo-sub">MUKBANG FOR ADMIN</div>
+          </div>
+        </NavLink>
 
         <div className="menu-wrapper">
           <ul className="menu">
             {menuItems.map((item) => (
               <li className="menu" key={item.path}>
-                <Link 
-                  to={item.path} 
+                <Link
+                  to={item.path}
                   className={currentPath === item.path ? 'active-link' : ''}
                   onClick={() => this.handleItemClick(item.path)}
                 >
@@ -182,12 +164,12 @@ class Menu extends Component {
         </div>
 
         <div className="user-profile-section">
-          <span className="user-greeting">
+          <span style={{ fontSize: '13px', fontWeight: '600' }}>
             Quản trị: <b className="user-name-highlight">{this.context.username}</b>
           </span>
-          <Link 
-            className="logout-btn" 
-            to="/admin/home" 
+          <Link
+            className="logout-btn"
+            to="/admin/home"
             onClick={() => {
               this.lnkLogoutClick();
               this.handleItemClick('/admin/home');
