@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 import MyContext from '../contexts/MyContext';
+import './CustomerComponent.css';
 
 class Customer extends Component {
   static contextType = MyContext; // using this.context to access global state
@@ -32,15 +33,15 @@ class Customer extends Component {
           <td>
             {item.active === 0 ? (
               <span
-                className="link"
-                onClick={() => this.lnkEmailClick(item)}
+                className="action-btn btn-email"
+                onClick={(e) => { e.stopPropagation(); this.lnkEmailClick(item); }}
               >
                 EMAIL
               </span>
             ) : (
               <span
-                className="link"
-                onClick={() => this.lnkDeactiveClick(item)}
+                className="action-btn btn-deactive"
+                onClick={(e) => { e.stopPropagation(); this.lnkDeactiveClick(item); }}
               >
                 DEACTIVE
               </span>
@@ -80,6 +81,7 @@ class Customer extends Component {
                 width="70px"
                 height="70px"
                 alt=""
+                className="product-img"
               />
             </td>
             <td>{item.product.price}</td>
@@ -91,12 +93,12 @@ class Customer extends Component {
     }
 
     return (
-      <div>
-        <div className="align-center">
-          <h2 className="text-center">CUSTOMER LIST</h2>
-          <table className="datatable" border="1">
-            <tbody>
-              <tr className="datatable">
+      <div className="customer-wrapper">
+        <div className="table-section">
+          <h2 className="section-title">CUSTOMER LIST</h2>
+          <table className="custom-table">
+            <thead>
+              <tr>
                 <th>ID</th>
                 <th>Username</th>
                 <th>Password</th>
@@ -106,17 +108,19 @@ class Customer extends Component {
                 <th>Active</th>
                 <th>Action</th>
               </tr>
+            </thead>
+            <tbody>
               {customers}
             </tbody>
           </table>
         </div>
 
         {this.state.orders.length > 0 ? (
-          <div className="align-center">
-            <h2 className="text-center">ORDER LIST</h2>
-            <table className="datatable" border="1">
-              <tbody>
-                <tr className="datatable">
+          <div className="table-section">
+            <h2 className="section-title">ORDER LIST</h2>
+            <table className="custom-table">
+              <thead>
+                <tr>
                   <th>ID</th>
                   <th>Creation date</th>
                   <th>Cust. name</th>
@@ -124,6 +128,8 @@ class Customer extends Component {
                   <th>Total</th>
                   <th>Status</th>
                 </tr>
+              </thead>
+              <tbody>
                 {orders}
               </tbody>
             </table>
@@ -133,11 +139,11 @@ class Customer extends Component {
         )}
 
         {this.state.order ? (
-          <div className="align-center">
-            <h2 className="text-center">ORDER DETAIL</h2>
-            <table className="datatable" border="1">
-              <tbody>
-                <tr className="datatable">
+          <div className="table-section">
+            <h2 className="section-title">ORDER DETAIL</h2>
+            <table className="custom-table">
+              <thead>
+                <tr>
                   <th>No.</th>
                   <th>Prod. ID</th>
                   <th>Prod. name</th>
@@ -146,6 +152,8 @@ class Customer extends Component {
                   <th>Quantity</th>
                   <th>Amount</th>
                 </tr>
+              </thead>
+              <tbody>
                 {items}
               </tbody>
             </table>
