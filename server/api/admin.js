@@ -107,7 +107,7 @@ router.post('/products', JwtUtil.checkToken, async function (req, res) {
 });
 
 router.put('/products/:id', JwtUtil.checkToken, async function (req, res) {
-  const _id = req.body.id;
+  const _id = req.params.id;
   const name = req.body.name;
   const price = req.body.price;
   const cid = req.body.category;
