@@ -94,9 +94,9 @@ class Menu extends Component {
 
           .menu-item a {
             text-decoration: none;
-            color: #444;
-            font-weight: 700;
-            font-size: 13px;
+            color: #222;
+            font-weight: 900; /* In đậm cực đại */
+            font-size: 14px;
             padding: 8px 18px;
             border-radius: 8px;
             text-transform: uppercase;
@@ -216,7 +216,7 @@ class Menu extends Component {
           <span className="nav-logo-icon" role="img" aria-hidden="true">🍜</span>
           <div>
             <div className="nav-logo-text">Korea Food</div>
-            <div className="nav-logo-sub">Mukbang Online</div>
+            <div className="nav-logo-sub">Mukbang Store</div>
           </div>
         </NavLink>
 
