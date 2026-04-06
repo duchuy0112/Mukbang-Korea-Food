@@ -8,8 +8,29 @@ class Home extends Component {
     super(props);
     this.state = {
       newprods: [],
-      hotprods: []
+      hotprods: [],
+      activeLocationIndex: 0,
+      locations: [
+        {
+          name: "Korea Food - Quận 1",
+          address: "123 Lê Lợi, P. Bến Thành, Quận 1, TP. HCM",
+          phone: "028 3822 1234",
+          time: "09:00 - 22:00 (Hàng ngày)",
+          mapUrl: "https://maps.google.com/maps?q=123%20Lê%20Lợi,%20Bến%20Thành,%20Quận%201,%20Hồ%20Chí%20Minh&output=embed"
+        },
+        {
+          name: "Korea Food - Quận 5",
+          address: "123 Nguyễn Văn Cừ, P. An Phú, Q. 5, TP. HCM",
+          phone: "028 5411 5678",
+          time: "10:00 - 22:30 (Hàng ngày)",
+          mapUrl: "https://maps.google.com/maps?q=123%20Nguyễn%20Văn%20Cừ,%20An%20Phú,%20Quận%205,%20Hồ%20Chí%20Minh&output=embed"
+        }
+      ]
     };
+  }
+
+  handleLocationClick(index) {
+    this.setState({ activeLocationIndex: index });
   }
 
   componentDidMount() {
@@ -17,301 +38,187 @@ class Home extends Component {
     this.apiGetHotProducts();
   }
 
-  // ================= RENDER TỪNG MÓN ĂN (GIỮ NGUYÊN TUYỆT ĐỐI LOGIC) =================
-  renderProductSection(products) {
-    return products.map((item) => {
-      if (!item || !item.image) return null;
-
-      return (
-        <div key={item._id} className="premium-item-wrapper">
-          <div className="premium-card">
-            <Link to={'/product/' + item._id} className="card-outer-link">
-              <div className="premium-img-box">
-                <img
-                  src={'data:image/jpg;base64,' + item.image}
-                  alt={item.name}
-                  className="premium-food-img"
-                />
-                <div className="img-overlay-soft"></div>
-                <div className="luxury-tag">KOREAN ARTISAN</div>
-              </div>
-            </Link>
-            
-            <div className="premium-info">
-              <div className="brand-accent">MUKBANG EXCLUSIVE</div>
-              <h3 className="premium-food-name">{item.name}</h3>
-              <div className="premium-price-row">
-                <span className="price-label">Investment</span>
-                <span className="price-value">{item.price?.toLocaleString()} <small>VNĐ</small></span>
-              </div>
-              <div className="luxury-line"></div>
-            </div>
-          </div>
-        </div>
-      );
-    });
-  }
-
   render() {
     return (
       <div className="luxury-home-container">
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@300;500;800&display=swap');
-
           :root {
-            --ruby-red: #9B111E;
-            --pure-black: #0A0A0A;
-            --champagne-gold: #D4AF37;
-            --soft-white: #fffdfa; /* Màu trắng sứ mịn */
+            --primary-red: #d32f2f;
+            --primary-orange: #e25a36;
+            --bg-soft: #fcfcfc;
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            --card-shadow-hover: 0 30px 60px rgba(0,0,0,0.1);
+            --accent-gradient: linear-gradient(135deg, #d32f2f 0%, #e25a36 100%);
           }
 
           .luxury-home-container {
-            min-height: 100vh;
-            background: var(--soft-white);
-            color: var(--pure-black);
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            background: var(--bg-soft);
           }
 
-          .visually-hidden {
-            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;
-          }
+          /* HERO SECTION */
+          .hero-banner-section { width: 100%; padding: 30px 40px; display: flex; justify-content: center; }
+          .hero-frame { width: 100%; max-width: 1400px; border-radius: 35px; overflow: hidden; box-shadow: 0 30px 70px rgba(0,0,0,0.1); position: relative; }
+          .hero-main-img { width: 100%; display: block; transition: 1s; }
 
-          /* HERO BANNER - NÂNG CẤP KHUNG TRANH TRIỂN LÃM ĐA CHIỀU */
-          .hero-banner-section {
-            width: 100%;
-            padding: 50px;
-            background: var(--soft-white);
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-          }
+          /* TITLES */
+          .section-header-box { max-width: 1250px; margin: 0 auto 35px; padding: 0 32px; display: flex; justify-content: space-between; align-items: flex-end; }
+          .sub-text { font-size: 11px; font-weight: 800; color: var(--primary-red); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; display: block; }
+          .main-title { font-size: 38px; font-weight: 900; color: #1a1a1a; margin: 0; letter-spacing: -1px; line-height: 1.1; }
+          .highlight-orange { color: var(--primary-orange); }
+          .view-all-link { text-decoration: none; color: #666; font-size: 14px; font-weight: 700; transition: 0.3s; }
+          .view-all-link:hover { color: var(--primary-red); }
 
-          .hero-frame {
-            position: relative;
-            width: 100%;
-            max-width: 1500px;
-            overflow: hidden;
-            border: 1px solid #eee;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.06);
-            /* HIỆU ỨNG CHUYỂN ĐỘNG CẢ NGƯỜI LẪN ẢNH (Parallax nhẹ) */
-            transform: translateZ(0); 
-            transition: 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-          }
-
-          .hero-frame:hover {
-            transform: scale(1.02);
-            box-shadow: 0 50px 120px rgba(155, 17, 30, 0.08);
-          }
-
-          .hero-main-img {
-            width: 100%;
-            height: auto;
-            display: block;
-            filter: contrast(1.03) brightness(1.01);
-            transition: transform 2s;
-          }
-
-          /* HIỆU ỨNG PHẢN QUANG GLASSMORPHISM chạy qua ảnh */
-          .hero-frame::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
-            transform: skewX(-25deg);
-            animation: reflect 5s infinite;
-          }
-
-          /* TIÊU ĐỀ KIỂU TẠP CHÍ SẮC NÉT */
-           .luxury-title-box {
-            text-align: center;
-            margin-bottom: 50px;
-          }
-
-           .luxury-title-box h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--pure-black);
-            margin: 0;
-            letter-spacing: -1px;
-            position: relative;
-            display: inline-block;
-            padding: 0 16px;
-          }
-
-          /* VIỀN MẢNH ĐỊNH HÌNH TIÊU ĐỀ */
-          .luxury-title-box h2::before, .luxury-title-box h2::after {
-            content: '';
-            position: absolute;
-            height: 1px; width: 100px;
-            background: var(--champagne-gold);
-            top: 50%; transform: translateY(-50%);
-          }
-          .luxury-title-box h2::before { left: -110px; }
-          .luxury-title-box h2::after { right: -110px; }
-
-          .luxury-title-box .sub-heading {
-            display: block;
-            font-size: 13px;
-            letter-spacing: 12px;
-            color: var(--ruby-red);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            font-weight: 600;
-          }
-
-          /* GRID HỆ THỐNG CAO CẤP */
-           .premium-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 28px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 32px;
-          }
-
-          /* CARD MÓN ĂN - THIẾT KẾ CỰC SANG, SẮC NÉT */
+          /* CARDS */
+          .premium-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; max-width: 1250px; margin: 0 auto; padding: 0 32px; }
           .premium-card {
-            background: #fff;
-            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-            position: relative;
-            border: 1px solid #f2f2f2; /* Viền định hình card */
+            background: #fff; border-radius: 24px; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid #f0f0f0;
+            transition: all 0.3s; position: relative; height: 100%; display: flex; flex-direction: column;
           }
+          .premium-card:hover { transform: translateY(-8px); box-shadow: var(--card-shadow-hover); }
+          .premium-img-box { height: 220px; overflow: hidden; position: relative; }
+          .premium-food-img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s; }
+          .premium-card:hover .premium-food-img { transform: scale(1.1); }
+          .luxury-tag { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); color: var(--primary-red); padding: 4px 12px; font-size: 10px; font-weight: 900; border-radius: 50px; }
+          .premium-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+          .premium-food-name { font-size: 18px; font-weight: 800; color: #1a1a1a; margin-bottom: 6px; }
+          .premium-food-desc { font-size: 13px; color: #777; line-height: 1.5; margin-bottom: 18px; height: 40px; overflow: hidden; }
+          .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+          .price-val { font-size: 20px; font-weight: 900; color: var(--primary-red); }
+          .btn-plus { width: 36px; height: 36px; background: #222; border: none; border-radius: 10px; color: #fff; font-size: 18px; cursor: pointer; transition: 0.3s; }
+          .premium-card:hover .btn-plus { background: var(--accent-gradient); }
 
-           .premium-img-box {
-            position: relative;
-            height: 240px;
-            overflow: hidden;
-            background: #f8f8f8;
-            border-bottom: 1px solid #eee;
+          /* LOCATIONS */
+          .locations-container { background: #fff; padding: 70px 0; }
+          .locations-content { max-width: 1250px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
+          .location-card {
+            background: #fff; padding: 25px; border-radius: 18px; border: 1.5px solid #f0f0f0; transition: 0.3s; cursor: pointer; margin-bottom: 15px;
           }
+          .location-card.active { border-color: var(--primary-orange); background: #fffaf7; }
+          .loc-name { font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+          .loc-detail { font-size: 14px; color: #666; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+          .btn-direction { margin-top: 12px; width: 100%; background: #222; color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 14px; }
 
-          .premium-food-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 1.8s cubic-bezier(0.19, 1, 0.22, 1);
-          }
+          /* ABOUT */
+          .about-us-section { padding: 70px 0; background: #fafafa; border-top: 1px solid #eee; }
+          .about-container { max-width: 1250px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
+          .restaurant-img { width: 100%; border-radius: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+          .about-title { font-size: 34px; font-weight: 900; margin: 12px 0 22px; line-height: 1.2; }
+          .about-p { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 20px; }
 
-          .img-overlay-soft {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.01);
-            pointer-events: none;
-          }
-
-           .luxury-tag {
-            position: absolute; bottom: 14px; left: 14px;
-            background: #fff; color: #000;
-            padding: 5px 14px; font-size: 8px; font-weight: 800;
-            letter-spacing: 2px; box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-            border: 1px solid var(--champagne-gold);
-          }
-
-          /* HOVER EFFECTS SANG TRỌNG */
-          .premium-card:hover { transform: translateY(-20px); box-shadow: 0 30px 70px rgba(155, 17, 30, 0.05); }
-          .premium-card:hover .premium-food-img { transform: scale(1.1) rotate(1deg); }
-
-           /* INFO INFO */
-          .premium-info { padding: 18px 10px 22px; text-align: center; }
-                    .brand-accent {
-            font-size: 9px; color: var(--ruby-red); font-weight: 800;
-            letter-spacing: 3px; margin-bottom: 8px;
-          }
-
-           .premium-food-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; color: #1a1a1a;
-            margin-bottom: 12px;
-          }
-
-          .premium-price-row {
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-          }
-
-           .price-label { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
-          .price-value { font-size: 18px; font-weight: 300; color: #000; letter-spacing: 1px; }
-          .price-value small { font-size: 10px; font-weight: 600; color: var(--ruby-red); }
-
-          /* ĐƯỜNG CHỈ LUXURY CHẠY KHI HOVER */
-           .luxury-line {
-            width: 0; height: 1px; background: var(--ruby-red);
-            margin: 14px auto 0; transition: 0.9s ease;
-          }
-          .premium-card:hover .luxury-line { width: 150px; }
-
-          /* KEYFRAMES */
-          @keyframes reflect {
-            0% { left: -100%; }
-            20% { left: 150%; }
-            100% { left: 150%; }
-          }
-
-           @media (max-width: 1000px) {
-            .premium-grid { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
-            .luxury-title-box h2 { font-size: 34px; }
-          }
-          @media (max-width: 600px) {
-            .premium-grid { grid-template-columns: 1fr; padding: 0 16px; }
-            .premium-img-box { height: 200px; }
+          @media (max-width: 900px) {
+            .about-container, .locations-content { grid-template-columns: 1fr; }
+            .hero-banner-section { padding: 20px; }
           }
         `}</style>
 
         <Helmet>
-          <title>Mukbang Korea Food | Ẩm Thực Hàn Quốc Đẳng Cấp & Chính Hiệu</title>
-          <meta name="description" content="Thưởng thức các món ngon Hàn Quốc đẳng cấp từ Mukbang. Đặt món Online Bibimbap, Kimbap, Tokbokki, Mì Cay, Gà Rán. Giao hàng thần tốc, chuẩn vị Seoul." />
-          <meta name="keywords" content="đồ ăn hàn, kimbap ngon, mukbang korea food, đặt món trực tuyến, ẩm thực hàn quốc quận 5" />
-          <meta property="og:title" content="Mukbang Korea Food | Thiên Đường Ẩm Thực Hàn Quốc" />
-          <meta property="og:description" content="Hơn 50+ món Hàn chính hiệu đang chờ bạn. Đặt ngay để nhận ưu đãi hấp dẫn!" />
+          <title>Korea Food | Ẩm Thực Hàn Quốc</title>
         </Helmet>
 
-        {/* HERO BANNER - TOÀN DIỆN, CHUYỂN ĐỘNG & SÁNG SỦA */}
+        {/* HERO */}
         <section className="hero-banner-section">
           <div className="hero-frame">
-            <h1 className="visually-hidden">Tận Hưởng Ẩm Thực Hàn Quốc Đẳng Cấp Cùng Mukbang - Thực Đơn Phong Phú, Giao Ngay Tận Nhà</h1>
-            <img 
-              src="/images/hero-bg.png" 
-              alt="Trải nghiệm ẩm thực Hàn Quốc đẳng cấp tại Mukbang Korea Food - Không gian sang trọng và món ăn chuẩn vị" 
-              className="hero-main-img" 
-            />
+            <img src="/images/hero-bg.png" alt="Hero" className="hero-main-img" />
           </div>
         </section>
 
-        <div className="content-wrapper-box">
-          {/* MÓN MỚI RA LÒ (GIỮ NGUYÊN LOGIC) */}
-          <section style={{marginTop:'30px'}}>
-            <div className="luxury-title-box">
-              <span className="sub-heading">New Artisan Collection</span>
-              <h2>Món Mới Cực Hot</h2>
+        {/* SECTION 1: ABOUT US */}
+        <section id="about" className="about-us-section">
+          <div className="about-container">
+            <div className="about-left">
+              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="About US" className="restaurant-img" />
             </div>
-            <div className="premium-grid">
-              {this.state.newprods.length > 0 
-                ? this.renderProductSection(this.state.newprods) 
-                : <div className="text-center" style={{letterSpacing:'4px'}}>CURATING THE EXPERIENCE...</div>
-              }
+            <div className="about-right">
+              <span className="sub-text">VỀ CHÚNG TÔI</span>
+              <h2 className="about-title">Mukbang Korea Food - Tinh hoa ẩm thực <span className="highlight-orange">Hàn Quốc</span></h2>
+              <p className="about-p">
+                Mukbang Korea Food tự hào mang đến cho thực khách những trải nghiệm ẩm thực Hàn Quốc đích thực ngay tại Việt Nam. 
+              </p>
+              <p className="about-p">
+                Với đội ngũ đầu bếp tâm huyết và nguồn nguyên liệu chất lượng, chúng tôi không ngừng nỗ lực để mang đến những bữa ăn ngon miệng, ấm cúng cho bạn và gia đình.
+              </p>
+              <Link to="/product/category/all" className="view-all-link" style={{ color: 'var(--primary-red)' }} onClick={() => window.scrollTo(0, 0)}>KHÁM PHÁ THỰC ĐƠN ➔</Link>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* MÓN ĐƯỢC YÊU THÍCH NHẤT (GIỮ NGUYÊN LOGIC) */}
-          {this.state.hotprods.length > 0 && (
-            <section style={{marginTop: '60px', marginBottom: '100px'}}>
-              <div className="luxury-title-box">
-                <span className="sub-heading">Chef's Masterpieces</span>
-                <h2>Món Ngon Phải Thử</h2>
-              </div>
-              <div className="premium-grid">
-                {this.renderProductSection(this.state.hotprods)}
-              </div>
-            </section>
-          )}
-        </div>
+        {/* SECTION 2: HOT PRODUCTS (HƯƠNG VỊ GÂY NGHIỆN) */}
+        <section style={{ padding: '80px 0', background: '#fff' }}>
+          <div className="section-header-box">
+            <div className="title-group">
+              <span className="sub-text">Thực đơn đặc sắc</span>
+              <h2 className="main-title">Hương vị <span className="highlight-orange">Gây Nghiện</span></h2>
+            </div>
+            <Link to="/product/category/all" className="view-all-link" onClick={() => window.scrollTo(0, 0)}>Xem tất cả ➔</Link>
+          </div>
+
+          <div className="premium-grid">
+            {(() => {
+              const allItems = [...this.state.hotprods, ...this.state.newprods];
+              const uniqueItems = allItems.filter((v, i, a) => a.findIndex(t => t._id === v._id) === i);
+              return uniqueItems.slice(0, 4).map((item) => (
+                <div key={item._id} className="premium-card">
+                  <Link to={'/product/' + item._id} style={{ textDecoration: 'none', color: 'inherit' }} onClick={() => window.scrollTo(0, 0)}>
+                    <div className="premium-img-box">
+                      <img src={'data:image/jpg;base64,' + item.image} alt={item.name} className="premium-food-img" />
+                      <div className="luxury-tag">POPULAR</div>
+                    </div>
+                    <div className="premium-info">
+                      <h3 className="premium-food-name">{item.name}</h3>
+                      <p className="premium-food-desc">
+                        {item.description || "Món ăn chuẩn vị Hàn Quốc, được chế biến tâm huyết bởi đầu bếp chuyên nghiệp."}
+                      </p>
+                      <div className="card-footer">
+                        <span className="price-val">{item.price?.toLocaleString()}đ</span>
+                        <button className="btn-plus">+</button>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ));
+            })()}
+          </div>
+        </section>
+
+        {/* SECTION 3: LOCATIONS (BẢN ĐỒ CHI NHÁNH) */}
+        <section id="locations" className="locations-container" style={{ background: '#fafafa', borderTop: '1px solid #eee' }}>
+          <div className="section-header-box">
+            <div className="title-group">
+              <span className="sub-text">Hệ thống chi nhánh</span>
+              <h2 className="main-title">Gần bạn <span className="highlight-orange">Luôn Sẵn Sàng</span></h2>
+            </div>
+          </div>
+
+          <div className="locations-content">
+            <div className="location-cards">
+              {this.state.locations.map((loc, index) => (
+                <div
+                  key={index}
+                  className={`location-card ${this.state.activeLocationIndex === index ? 'active' : ''}`}
+                  onClick={() => this.handleLocationClick(index)}
+                >
+                  <h4 className="loc-name">{loc.name}</h4>
+                  <div className="loc-detail"><span>📍</span> {loc.address}</div>
+                  <div className="loc-detail"><span>📞</span> {loc.phone}</div>
+                  <button className="btn-direction">Xem bản đồ</button>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderRadius: '25px', overflow: 'hidden', height: '400px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
+              <iframe
+                title="Google Map"
+                src={this.state.locations[this.state.activeLocationIndex].mapUrl}
+                width="100%" height="100%" style={{ border: 0 }} allowFullScreen="" loading="lazy"
+              ></iframe>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
 
-  // ================= APIs (GIỮ NGUYÊN TUYỆT ĐỐI) =================
   apiGetNewProducts() {
     axios.get('/api/customer/products/new').then((res) => {
       this.setState({ newprods: res.data || [] });

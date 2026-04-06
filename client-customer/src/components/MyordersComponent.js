@@ -30,6 +30,7 @@ class Myorders extends Component {
           <td>{new Date(item.cdate).toLocaleString('vi-VN')}</td>
           <td>{item.customer?.name || 'Khách hàng'}</td>
           <td>{item.customer?.phone}</td>
+          <td>{item.customer?.address || 'Chưa cung cấp'}</td>
           <td className="total-cell">{item.total?.toLocaleString()} đ</td>
           <td>
             <span className={`status-badge ${item.status.toLowerCase()}`}>
@@ -176,13 +177,14 @@ class Myorders extends Component {
                   <th>Ngày Đặt</th>
                   <th>Tên Khách</th>
                   <th>Số Điện Thoại</th>
+                  <th>Địa Chỉ</th>
                   <th>Tổng Tiền</th>
                   <th>Trạng Thái</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.length > 0 ? orders : (
-                  <tr><td colSpan="6" style={{textAlign: 'center', padding: '30px'}}>Bạn chưa có đơn hàng nào.</td></tr>
+                  <tr><td colSpan="7" style={{textAlign: 'center', padding: '30px'}}>Bạn chưa có đơn hàng nào.</td></tr>
                 )}
               </tbody>
             </table>

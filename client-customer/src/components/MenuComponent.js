@@ -1,19 +1,15 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
+import { HashLink } from 'react-router-hash-link';
 import withRouter from '../utils/withRouter';
 
 class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      categories: [],
       txtKeyword: ''
     };
-  }
-
-  componentDidMount() {
-    this.apiGetCategories();
   }
 
   btnSearchClick(e) {
@@ -23,191 +19,52 @@ class Menu extends Component {
     }
   }
 
-  apiGetCategories() {
-    axios.get('/api/customer/categories').then((res) => {
-      this.setState({ categories: res.data || [] });
-    });
-  }
-
   render() {
-    const cates = this.state.categories.map((item) => (
-      <li key={item._id} className="menu-item">
-        <NavLink to={'/product/category/' + item._id} aria-label={`Danh mục ${item.name}`}>
-          {item.name}
-        </NavLink>
-      </li>
-    ));
-
     return (
       <nav className="k-nav-main" role="navigation" aria-label="Menu chính">
         <style>{`
           .k-nav-main {
-            background: #ffffff;
-            padding: 0 40px;
-            height: 72px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 0 50px;
+            height: 68px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 3px solid #d32f2f;
-            font-family: 'Inter', sans-serif;
-            gap: 24px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 30px;
+            z-index: 2000;
           }
 
           /* ===== LOGO ===== */
-          .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            flex-shrink: 0;
-          }
-
-          .nav-logo-icon {
-            font-size: 28px;
-          }
-
-          .nav-logo-text {
-            font-size: 16px;
-            font-weight: 900;
-            color: #d32f2f;
-            letter-spacing: -0.5px;
-            line-height: 1.1;
-          }
-
-          .nav-logo-sub {
-            font-size: 10px;
-            font-weight: 600;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-          }
+          .nav-logo { display: flex; align-items: center; gap: 15px; text-decoration: none; flex-shrink: 0; }
+          .nav-logo-icon { font-size: 36px; filter: drop-shadow(0 4px 10px rgba(211, 47, 47, 0.2)); }
+          .nav-logo-text { font-size: 20px; font-weight: 900; color: #1a1a1a; letter-spacing: -0.5px; }
+          .nav-logo-sub { font-size: 11px; font-weight: 800; color: var(--primary-red); text-transform: uppercase; letter-spacing: 2.5px; margin-top: -2px; }
 
           /* ===== MENU LINKS ===== */
-          .nav-menu-list {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            gap: 4px;
-            align-items: center;
-          }
-
+          .nav-menu-list { display: flex; list-style: none; margin: 0; padding: 0; gap: 8px; align-items: center; }
           .menu-item a {
-            text-decoration: none;
-            color: #222;
-            font-weight: 900; /* In đậm cực đại */
-            font-size: 14px;
-            padding: 8px 18px;
-            border-radius: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            transition: all 0.25s ease;
-            display: inline-block;
-            white-space: nowrap;
+            text-decoration: none; color: #555; font-weight: 700; font-size: 15px;
+            padding: 12px 22px; border-radius: 50px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; gap: 10px;
           }
-
-          .menu-item a:hover:not(.active) {
-            background: rgba(211, 47, 47, 0.08);
-            color: #d32f2f;
-          }
-
-          .menu-item a.active {
-            color: #fff;
-            background: #d32f2f;
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-          }
-
-          .menu-item a:focus-visible {
-            outline: 2px solid #d32f2f;
-            outline-offset: 2px;
-          }
+          .menu-item a:hover:not(.active) { background: #fafafa; color: var(--primary-red); transform: translateY(-2px); }
+          .menu-item a.active { color: #fff; background: var(--accent-gradient); box-shadow: 0 10px 25px rgba(211, 47, 47, 0.3); }
 
           /* ===== SEARCH ===== */
           .nav-search-form {
-            display: flex;
-            background: #f5f5f5;
-            border: 2px solid transparent;
-            border-radius: 40px;
-            padding: 4px 4px 4px 20px;
-            transition: all 0.3s;
-            flex: 1;
-            max-width: 420px;
-            min-width: 200px;
+            display: flex; background: #f5f5f5; border-radius: 50px; padding: 5px 5px 5px 25px;
+            transition: 0.4s; flex: 1; max-width: 320px; border: 1.5px solid transparent;
           }
+          .nav-search-form:focus-within { background: #fff; border-color: var(--primary-orange); box-shadow: 0 10px 30px rgba(255, 109, 0, 0.08); max-width: 350px; }
+          .nav-search-input { border: none; background: transparent; padding: 8px 12px; outline: none; font-weight: 600; font-size: 14px; color: #1a1a1a; flex: 1; }
+          .nav-search-btn { background: none; border: none; padding: 8px 15px; font-size: 20px; cursor: pointer; transition: 0.3s; opacity: 0.6; }
+          .nav-search-btn:hover { color: var(--primary-red); transform: scale(1.15); opacity: 1; }
 
-          .nav-search-form:focus-within {
-            border-color: #d32f2f;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
-          }
-
-          .nav-search-input {
-            border: none;
-            background: transparent;
-            padding: 8px 12px;
-            outline: none;
-            font-weight: 600;
-            font-size: 14px;
-            color: #333;
-            flex: 1;
-            min-width: 0;
-          }
-
-          .nav-search-input::placeholder {
-            color: #999;
-            font-weight: 500;
-          }
-
-          .nav-search-btn {
-            background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-            white-space: nowrap;
-          }
-
-          .nav-search-btn:hover {
-            background: #b71c1c;
-            transform: scale(1.03);
-          }
-
-          .nav-search-btn:focus-visible {
-            outline: 2px solid #ff9f43;
-            outline-offset: 2px;
-          }
-
-          /* ===== RESPONSIVE ===== */
-          @media (max-width: 1024px) {
-            .k-nav-main {
-              padding: 0 20px;
-              height: auto;
-              flex-wrap: wrap;
-              gap: 12px;
-              padding: 12px 20px;
-            }
-            .nav-search-form {
-              max-width: 100%;
-              order: 3;
-              flex-basis: 100%;
-            }
-          }
-
-          @media (max-width: 600px) {
-            .nav-menu-list {
-              flex-wrap: wrap;
-              gap: 2px;
-            }
-            .menu-item a {
-              font-size: 11px;
-              padding: 6px 12px;
-            }
+          @media (max-width: 768px) {
+            .k-nav-main { padding: 0 20px; }
+            .nav-menu-list { display: none; }
           }
         `}</style>
 
@@ -215,17 +72,47 @@ class Menu extends Component {
         <NavLink to="/home" className="nav-logo" aria-label="Về trang chủ Mukbang Korea Food">
           <span className="nav-logo-icon" role="img" aria-hidden="true">🍜</span>
           <div>
-            <div className="nav-logo-text">Korea Food</div>
+            <div className="nav-logo-text">Korea Food </div>
             <div className="nav-logo-sub">Mukbang Store</div>
           </div>
         </NavLink>
 
-        {/* CATEGORY MENU */}
+        {/* MENU LINKS */}
         <ul className="nav-menu-list" role="menubar">
           <li className="menu-item" role="none">
-            <NavLink to="/home" role="menuitem">Trang Chủ</NavLink>
+            <NavLink to="/home" role="menuitem" onClick={() => window.scrollTo(0, 0)}>Trang Chủ</NavLink>
           </li>
-          {cates}
+          <li className="menu-item" role="none">
+            <NavLink to="/product/category/all" role="menuitem" onClick={() => window.scrollTo(0, 0)}>Thực Đơn</NavLink>
+          </li>
+          <li className="menu-item" role="none">
+            <HashLink
+              smooth
+              to="/home#about"
+              role="menuitem"
+              scroll={(el) => {
+                const offset = 100;
+                const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+              }}
+            >
+              Về Chúng Tôi
+            </HashLink>
+          </li>
+          <li className="menu-item" role="none">
+            <HashLink
+              smooth
+              to="/home#locations"
+              role="menuitem"
+              scroll={(el) => {
+                const offset = 100;
+                const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+              }}
+            >
+              Cửa Hàng
+            </HashLink>
+          </li>
         </ul>
 
         {/* SEARCH */}
@@ -244,7 +131,7 @@ class Menu extends Component {
             onChange={(e) => this.setState({ txtKeyword: e.target.value })}
           />
           <button type="submit" className="nav-search-btn" aria-label="Tìm kiếm">
-            Tìm kiếm
+            🔍
           </button>
         </form>
       </nav>

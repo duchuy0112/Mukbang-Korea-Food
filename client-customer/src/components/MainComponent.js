@@ -36,160 +36,123 @@ class Main extends Component {
     return (
       <div className="body-customer-premium">
         <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@700;900&display=swap');
+
           /* ============ GLOBAL RESET & TYPOGRAPHY ============ */
           *, *::before, *::after { box-sizing: border-box; }
 
-          .body-customer-premium {
-            min-height: 100vh;
-            background: #ffffff;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            color: #1a1a1a;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+          :root {
+            --primary-red: #D32F2F;
+            --primary-orange: #FF6D00;
+            --accent-gradient: linear-gradient(135deg, #FF6D00 0%, #D32F2F 100%);
+            --bg-soft: #FDFBFA;
+            --text-main: #1A1A1A;
+            --text-muted: #666666;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --card-shadow-hover: 0 20px 50px rgba(0,0,0,0.1);
           }
 
-          /* ============ SKIP TO CONTENT (Accessibility) ============ */
+          .body-customer-premium {
+            min-height: 100vh;
+            background: var(--bg-soft);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+          }
+
+          h1, h2, h3, h4 { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 900; }
+
+          /* ============ SKIP TO CONTENT ============ */
           .skip-to-content {
-            position: absolute;
-            top: -100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #d32f2f;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 0 0 8px 8px;
-            font-weight: 700;
-            z-index: 99999;
-            text-decoration: none;
-            transition: top 0.3s;
+            position: absolute; top: -100%; left: 50%; transform: translateX(-50%);
+            background: var(--primary-red); color: #fff; padding: 12px 24px;
+            border-radius: 0 0 8px 8px; font-weight: 700; z-index: 99999;
+            text-decoration: none; transition: top 0.3s;
           }
-          .skip-to-content:focus {
-            top: 0;
-          }
+          .skip-to-content:focus { top: 0; }
 
           /* ============ HEADER ============ */
           .header-main-sticky {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: white;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
           }
 
-          /* ============ HOT PRODUCTS MARQUEE ============ */
+          /* ============ HOT BAR ============ */
           .hot-bar-container {
-            background: linear-gradient(90deg, #d32f2f 0%, #e53935 50%, #ff5722 100%);
-            padding: 10px 0;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
+            background: var(--accent-gradient); padding: 12px 0; overflow: hidden;
           }
-
-          .hot-marquee {
-            display: flex;
-            white-space: nowrap;
-            animation: marqueeEffect 25s linear infinite;
-          }
-
+          .hot-marquee { display: flex; animation: marquee 30s linear infinite; }
           .hot-item {
-            color: rgba(255,255,255,0.95);
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 0 32px;
-            letter-spacing: 1.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: #fff; font-size: 13px; font-weight: 800;
+            text-transform: uppercase; padding: 0 40px; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px;
           }
-
-          .hot-item::before {
-            content: '🔥';
-            font-size: 14px;
-          }
-
-          @keyframes marqueeEffect {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
+          @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
           /* ============ MAIN CONTENT ============ */
-          .main-content-flow {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-            animation: fadeInUp 0.6s ease-out;
-          }
-
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
+          .main-content-flow { max-width: 1300px; margin: 0 auto; padding: 40px 24px; min-height: 80vh; }
 
           /* ============ FOOTER ============ */
           .site-footer {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: rgba(255,255,255,0.85);
-            margin-top: 80px;
+            background: #131110;
+            color: #fff;
+            margin-top: 100px;
           }
 
           .footer-inner {
-            max-width: 1280px;
+            max-width: 1300px;
             margin: 0 auto;
-            padding: 60px 24px 30px;
+            padding: 80px 24px 40px;
           }
 
           .footer-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.5fr;
-            gap: 40px;
-            padding-bottom: 40px;
+            grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+            gap: 60px;
+            padding-bottom: 50px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
           }
 
           .footer-brand h3 {
-            font-size: 24px;
-            font-weight: 900;
-            color: #fff;
-            margin: 0 0 4px;
-            letter-spacing: -0.5px;
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary-orange);
           }
 
           .footer-brand-sub {
-            font-size: 13px;
             color: #ff9f43;
             font-weight: 600;
-            margin: 0 0 16px;
+            margin-bottom: 15px;
+            display: block;
           }
 
           .footer-brand p {
-            font-size: 14px;
-            line-height: 1.7;
-            color: rgba(255,255,255,0.65);
-            margin: 0;
+            font-size: 15px;
+            color: #aaa;
+            line-height: 1.8;
           }
 
           .footer-col h4 {
-            font-size: 13px;
-            font-weight: 800;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin-bottom: 25px;
             color: #fff;
-            margin: 0 0 20px;
             position: relative;
-            padding-bottom: 10px;
           }
 
           .footer-col h4::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: -8px;
             left: 0;
-            width: 30px;
-            height: 2px;
-            background: #d32f2f;
-            border-radius: 2px;
+            width: 40px;
+            height: 3px;
+            background: var(--primary-red);
+            border-radius: 10px;
           }
 
           .footer-col ul {
@@ -199,82 +162,77 @@ class Main extends Component {
           }
 
           .footer-col li {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
           }
 
           .footer-col a {
-            color: rgba(255,255,255,0.6);
+            color: #888;
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-block;
+            font-size: 15px;
+            transition: 0.3s;
           }
 
           .footer-col a:hover {
-            color: #ff9f43;
-            transform: translateX(4px);
+            color: var(--primary-orange);
+            padding-left: 8px;
           }
 
           .footer-contact-item {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 14px;
-            font-size: 14px;
-            color: rgba(255,255,255,0.65);
-          }
-
-          .footer-contact-item span:first-child {
-            font-size: 18px;
-            flex-shrink: 0;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: #aaa;
           }
 
           .footer-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 24px;
-            font-size: 13px;
-            color: rgba(255,255,255,0.4);
+            padding-top: 30px;
+            font-size: 14px;
+            color: #555;
           }
 
           .footer-social {
             display: flex;
-            gap: 12px;
+            gap: 15px;
           }
 
           .footer-social a {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            font-size: 16px;
-            transition: all 0.3s;
+            font-size: 18px;
+            transition: 0.3s;
           }
 
           .footer-social a:hover {
-            background: #d32f2f;
-            transform: translateY(-3px);
+            background: var(--primary-red);
+            transform: translateY(-5px);
           }
 
           /* ============ RESPONSIVE ============ */
+          @media (max-width: 1024px) {
+            .footer-grid {
+              grid-template-columns: repeat(2, 1fr);
+              gap: 40px;
+            }
+          }
+
           @media (max-width: 768px) {
             .footer-grid {
               grid-template-columns: 1fr;
-              gap: 30px;
             }
             .footer-bottom {
               flex-direction: column;
-              gap: 16px;
+              gap: 20px;
               text-align: center;
-            }
-            .main-content-flow {
-              padding: 0 16px;
             }
           }
         `}</style>
@@ -284,7 +242,6 @@ class Main extends Component {
           Bỏ qua đến nội dung chính
         </a>
 
-        {/* ============ HEADER ============ */}
         <header className="header-main-sticky" role="banner">
           <Menu />
           <Inform />
@@ -337,11 +294,11 @@ class Main extends Component {
 
               {/* Quick Links */}
               <div className="footer-col">
-                <h4>Thực đơn</h4>
+                <h4>Liên Kết Nhanh</h4>
                 <ul>
-                  <li><Link to="/home">Trang Chủ</Link></li>
-                  <li><Link to="/home">Món Mới</Link></li>
-                  <li><Link to="/home">Bán Chạy</Link></li>
+                  <li><Link to="/home" onClick={() => window.scrollTo(0, 0)}>Trang Chủ</Link></li>
+                  <li><Link to="/product/category/all" onClick={() => window.scrollTo(0, 0)}>Thực Đơn</Link></li>
+                  <li><Link to="/home" onClick={() => window.scrollTo(0, 0)}>Bán Chạy</Link></li>
                 </ul>
               </div>
 
@@ -356,7 +313,17 @@ class Main extends Component {
                 </ul>
               </div>
 
-              {/* Contact */}
+              {/* Support & Legal */}
+              <div className="footer-col">
+                <h4>Thông Tin</h4>
+                <ul>
+                  <li><Link to="/home" onClick={() => window.scrollTo(0, 0)}>Chính sách bảo mật</Link></li>
+                  <li><Link to="/home" onClick={() => window.scrollTo(0, 0)}>Điều khoản dịch vụ</Link></li>
+                  <li><Link to="/home" onClick={() => window.scrollTo(0, 0)}>Liên hệ</Link></li>
+                </ul>
+              </div>
+
+              {/* Contact Info */}
               <div className="footer-col">
                 <h4>Liên hệ</h4>
                 <div className="footer-contact-item">

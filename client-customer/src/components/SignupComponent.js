@@ -11,6 +11,7 @@ class Signup extends Component {
       txtName: '',
       txtPhone: '',
       txtEmail: '',
+      txtAddress: '',
       mounted: false
     };
   }
@@ -136,6 +137,7 @@ class Signup extends Component {
             {this.renderInput('Họ và tên', 'txtName', 'text', 'Nhập họ và tên đầy đủ', '✨')}
             {this.renderInput('Số điện thoại', 'txtPhone', 'tel', 'Nhập số điện thoại', '📱')}
             {this.renderInput('Email', 'txtEmail', 'email', 'example@gmail.com', '📧')}
+            {this.renderInput('Địa chỉ', 'txtAddress', 'text', 'Nhập địa chỉ của bạn', '🏠')}
 
             <button
               type="submit"
@@ -177,15 +179,16 @@ class Signup extends Component {
 
   btnSignupClick(e) {
     e.preventDefault();
-    const { txtUsername, txtPassword, txtName, txtPhone, txtEmail } = this.state;
+    const { txtUsername, txtPassword, txtName, txtPhone, txtEmail, txtAddress } = this.state;
 
-    if (txtUsername && txtPassword && txtName && txtPhone && txtEmail) {
+    if (txtUsername && txtPassword && txtName && txtPhone && txtEmail && txtAddress) {
       const account = {
         username: txtUsername,
         password: txtPassword,
         name: txtName,
         phone: txtPhone,
-        email: txtEmail
+        email: txtEmail,
+        address: txtAddress
       };
       this.apiSignup(account);
     } else {

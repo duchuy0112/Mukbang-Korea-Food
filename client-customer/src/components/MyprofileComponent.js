@@ -14,6 +14,7 @@ class Myprofile extends Component {
       txtName: "",
       txtPhone: "",
       txtEmail: "",
+      txtAddress: "",
     };
   }
 
@@ -208,6 +209,16 @@ class Myprofile extends Component {
               />
             </div>
 
+            <div className="form-group full-width">
+              <label>Địa chỉ</label>
+              <input
+                className="k-input"
+                type="text"
+                value={this.state.txtAddress}
+                onChange={(e) => this.setState({ txtAddress: e.target.value })}
+              />
+            </div>
+
             <button type="submit" className="btn-update">
               Cập Nhật Hồ Sơ 
             </button>
@@ -225,21 +236,23 @@ class Myprofile extends Component {
         txtName: this.context.customer.name,
         txtPhone: this.context.customer.phone,
         txtEmail: this.context.customer.email,
+        txtAddress: this.context.customer.address || "",
       });
     }
   }
 
   btnUpdateClick(e) {
     e.preventDefault();
-    const { txtUsername, txtPassword, txtName, txtPhone, txtEmail } = this.state;
+    const { txtUsername, txtPassword, txtName, txtPhone, txtEmail, txtAddress } = this.state;
 
-    if (txtUsername && txtPassword && txtName && txtPhone && txtEmail) {
+    if (txtUsername && txtPassword && txtName && txtPhone && txtEmail && txtAddress) {
       const customer = {
         username: txtUsername,
         password: txtPassword,
         name: txtName,
         phone: txtPhone,
         email: txtEmail,
+        address: txtAddress,
       };
       this.apiPutCustomer(this.context.customer._id, customer);
     } else {
