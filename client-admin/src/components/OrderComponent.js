@@ -27,6 +27,7 @@ class Order extends Component {
           <td>{new Date(item.cdate).toLocaleString('vi-VN')}</td>
           <td className="font-bold">{item.customer?.name}</td>
           <td>{item.customer?.phone}</td>
+          <td>{item.customer?.address || 'Chưa cung cấp'}</td>
           <td className="price-text">{item.total?.toLocaleString()} đ</td>
           <td>
             <span className={`admin-status-badge ${item.status.toLowerCase()}`}>
@@ -170,6 +171,7 @@ class Order extends Component {
                 <th>Ngày Tạo</th>
                 <th>Tên Khách</th>
                 <th>Điện Thoại</th>
+                <th>Địa Chỉ</th>
                 <th>Tổng Cộng</th>
                 <th>Trạng Thái</th>
                 <th>Thao Tác</th>

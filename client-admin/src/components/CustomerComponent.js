@@ -29,6 +29,7 @@ class Customer extends Component {
           <td>{item.name}</td>
           <td>{item.phone}</td>
           <td>{item.email}</td>
+          <td>{item.address}</td>
           <td>{item.active}</td>
           <td>
             {item.active === 0 ? (
@@ -105,6 +106,7 @@ class Customer extends Component {
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Email</th>
+                <th>Address</th>
                 <th>Active</th>
                 <th>Action</th>
               </tr>

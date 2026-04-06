@@ -13,6 +13,7 @@ class ProductDetail extends Component {
       txtName: '',
       txtPrice: 0,
       cmbCategory: '',
+      txtDescription: '',
       imgProduct: '',
     };
   }
@@ -29,6 +30,7 @@ class ProductDetail extends Component {
         txtName: this.props.item.name,
         txtPrice: this.props.item.price,
         cmbCategory: this.props.item.category._id,
+        txtDescription: this.props.item.description || '',
         imgProduct: 'data:image/jpg;base64,' + this.props.item.image,
       });
     }
@@ -51,10 +53,11 @@ class ProductDetail extends Component {
     const name = this.state.txtName;
     const price = parseInt(this.state.txtPrice);
     const category = this.state.cmbCategory;
+    const description = this.state.txtDescription;
     const image = this.state.imgProduct.replace(/^data:image\/[a-z]+;base64,/, '');
 
     if (name && price && category && image) {
-      const prod = { name, price, category, image };
+      const prod = { name, price, category, description, image };
       this.apiPostProduct(prod);
     } else {
       alert('Vui lòng nhập đầy đủ thông tin sản phẩm!');
@@ -67,10 +70,11 @@ class ProductDetail extends Component {
     const name = this.state.txtName;
     const price = parseInt(this.state.txtPrice);
     const category = this.state.cmbCategory;
+    const description = this.state.txtDescription;
     const image = this.state.imgProduct.replace(/^data:image\/[a-z]+;base64,/, '');
 
     if (id && name && price && category && image) {
-      const prod = { name, price, category, image };
+      const prod = { name, price, category, description, image };
       this.apiPutProduct(id, prod);
     } else {
       alert('Vui lòng chọn sản phẩm cần cập nhật!');
@@ -311,6 +315,18 @@ class ProductDetail extends Component {
                 <td className="label-text">Hình Ảnh</td>
                 <td>
                   <input type="file" className="input-custom" accept="image/*" onChange={(e) => this.previewImage(e)} />
+                </td>
+              </tr>
+              <tr>
+                <td className="label-text">Mô Tả Chi Tiết</td>
+                <td>
+                  <textarea 
+                    className="input-custom" 
+                    rows="4" 
+                    value={this.state.txtDescription} 
+                    onChange={(e) => this.setState({ txtDescription: e.target.value })} 
+                    placeholder="Nhập mô tả món ăn..."
+                  ></textarea>
                 </td>
               </tr>
               <tr>

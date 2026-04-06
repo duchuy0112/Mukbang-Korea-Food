@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MyContext from '../contexts/MyContext';
 
 class Menu extends Component {
@@ -16,8 +16,7 @@ class Menu extends Component {
     this.setState({ activePath: path });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    // Sửa lỗi vòng lặp vô hạn
+  componentDidUpdate() {
     if (window.location.pathname !== this.state.activePath) {
       this.setState({ activePath: window.location.pathname });
     }
@@ -27,156 +26,180 @@ class Menu extends Component {
     const currentPath = this.state.activePath;
 
     const menuItems = [
-      { path: '/admin/home', label: 'Trang Chủ' },
-      { path: '/admin/order', label: 'Đơn Hàng' },
-      { path: '/admin/customer', label: 'Khách Hàng' },
-      { path: '/admin/category', label: 'Danh Mục' },
-      { path: '/admin/product', label: 'Sản Phẩm' },
-      { path: '/admin/revenue', label: 'Doanh Thu' },
+      { path: '/admin/home', label: 'Trang chủ', icon: '🏠' },
+      { path: '/admin/order', label: 'Đơn hàng', icon: '🛒' },
+      { path: '/admin/customer', label: 'Khách hàng', icon: '👥' },
+      { path: '/admin/category', label: 'Danh mục', icon: '📁' },
+      { path: '/admin/product', label: 'Sản phẩm', icon: '🍱' },
+      { path: '/admin/revenue', label: 'Doanh thu', icon: '💰' },
     ];
 
     return (
-      <div className="admin-navbar-premium">
+      <div className="admin-sidebar" role="navigation" aria-label="Menu quản trị">
         <style>{`
-          .admin-navbar-premium {
-            background: #ffffff;
-            padding: 0 40px;
+          .admin-sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #f0f0f0;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 75px;
-            box-shadow: 0 4px 25px rgba(211, 47, 47, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 9999;
-            font-family: 'Inter', sans-serif;
-            border-bottom: 3px solid #ff9f43;
+            flex-direction: column;
+            padding: 30px 0;
+            flex-shrink: 0;
           }
 
-          .logo-admin {
-            font-weight: 900; /* Cực đậm cho Logo */
-            font-size: 20px;
-            color: #d32f2f;
+          .sidebar-brand {
+            padding: 0 30px 40px;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            gap: 5px;
+          }
+
+          .brand-main {
+            font-size: 24px;
+            font-weight: 900;
+            color: #b3261e;
+            letter-spacing: -0.5px;
+          }
+
+          .brand-sub {
+            font-size: 11px;
+            font-weight: 800;
+            color: #999;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-decoration: none;
           }
 
-          .menu-wrapper {
-            display: flex;
-            align-items: center;
-            height: 100%;
-            flex-grow: 1;
-            justify-content: center;
-          }
-
-          ul.menu {
+          .sidebar-menu {
             list-style: none;
-            display: flex;
-            margin: 0;
             padding: 0;
-            gap: 8px;
+            margin: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
           }
 
-          li.menu a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 800; /* Tăng độ đậm cho chữ Menu */
-            font-size: 14px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-          }
-
-          li.menu a.active-link {
-            background: linear-gradient(135deg, #ff9f43 0%, #d32f2f 100%);
-            color: white !important;
-            box-shadow: 0 5px 12px rgba(211, 47, 47, 0.3);
-          }
-
-          li.menu a:hover:not(.active-link) {
-            color: #d32f2f;
-            background: #fff0f0;
-          }
-
-          .user-profile-section {
+          .menu-item-link {
             display: flex;
             align-items: center;
-            background: #fff5ee;
-            padding: 8px 18px;
-            border-radius: 12px;
-            border: 1px solid #ffd8b1;
             gap: 15px;
-          }
-
-          .user-name-highlight {
-            color: #d32f2f;
-            font-weight: 900; /* In đậm tên quản trị viên */
-            text-decoration: underline;
-          }
-
-          .logout-btn {
+            padding: 14px 30px;
             text-decoration: none;
-            color: white;
-            background: #222;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 900; /* In đậm nút đăng xuất */
-            text-transform: uppercase;
-            transition: 0.3s;
+            color: #666;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            position: relative;
           }
 
-          .logout-btn:hover {
-            background: #d32f2f;
+          .menu-item-link:hover {
+            color: #b3261e;
+            background: #fdf5f5;
           }
-          
-          .nav-logo-text { font-weight: 900; line-height: 1; }
-          .nav-logo-sub { font-size: 11px; font-weight: 700; color: #666; }
+
+          .menu-item-link.active {
+            color: #b3261e;
+            background: #fdf5f5;
+          }
+
+          .menu-item-link.active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #b3261e;
+            border-radius: 4px 0 0 4px;
+          }
+
+          .sidebar-footer {
+            padding: 20px 20px;
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid #f0f0f0;
+          }
+
+          .btn-add-new {
+            background: #b3261e;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(179, 38, 30, 0.2);
+          }
+
+          .btn-add-new:hover {
+            background: #991f19;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(179, 38, 30, 0.3);
+          }
+
+          .secondary-nav {
+             display: flex;
+             flex-direction: column;
+             gap: 2px;
+             margin-top: 10px;
+          }
+
+          .sec-nav-link {
+            padding: 10px 30px;
+            color: #888;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+
+          .sec-nav-link:hover {
+            color: #333;
+          }
         `}</style>
 
-        <NavLink to="/admin/home" className="logo-admin">
-          <span style={{ fontSize: '27px' }}>🍜</span>
-          <div>
-            <div className="nav-logo-text">KOREA FOOD</div>
-            <div className="nav-logo-sub">MUKBANG FOR ADMIN</div>
-          </div>
-        </NavLink>
-
-        <div className="menu-wrapper">
-          <ul className="menu">
-            {menuItems.map((item) => (
-              <li className="menu" key={item.path}>
-                <Link
-                  to={item.path}
-                  className={currentPath === item.path ? 'active-link' : ''}
-                  onClick={() => this.handleItemClick(item.path)}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="sidebar-brand">
+          <div className="brand-main">Mukbang Admin</div>
+          <div className="brand-sub">Hệ Thống Quản Trị</div>
         </div>
 
-        <div className="user-profile-section">
-          <span style={{ fontSize: '13px', fontWeight: '600' }}>
-            Quản trị: <b className="user-name-highlight">{this.context.username}</b>
-          </span>
-          <Link
-            className="logout-btn"
-            to="/admin/home"
-            onClick={() => {
-              this.lnkLogoutClick();
-              this.handleItemClick('/admin/home');
-            }}
-          >
-            Đăng xuất
-          </Link>
+        <ul className="sidebar-menu">
+          {menuItems.map((item) => (
+            <li key={item.path}>
+              <Link
+                to={item.path}
+                className={`menu-item-link ${currentPath === item.path ? 'active' : ''}`}
+                onClick={() => this.handleItemClick(item.path)}
+              >
+                <span style={{fontSize: '18px'}}>{item.icon}</span>
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <div className="sidebar-footer">
+
+<div className="secondary-nav">
+             <Link 
+                to="/admin/home" 
+                className="sec-nav-link"
+                onClick={() => this.lnkLogoutClick()}
+             >
+                ↪️ Đăng xuất
+             </Link>
+          </div>
         </div>
       </div>
     );
