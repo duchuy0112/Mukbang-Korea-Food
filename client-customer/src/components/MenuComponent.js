@@ -69,7 +69,7 @@ class Menu extends Component {
         `}</style>
 
         {/* LOGO */}
-        <NavLink to="/home" className="nav-logo" aria-label="Về trang chủ Mukbang Korea Food">
+        <NavLink to="/home" className="nav-logo" aria-label="Về trang chủ Mukbang Korea Food" onClick={() => window.scrollTo(0, 0)}>
           <span className="nav-logo-icon" role="img" aria-hidden="true">🍜</span>
           <div>
             <div className="nav-logo-text">Korea Food </div>

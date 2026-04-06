@@ -106,11 +106,11 @@ class Inform extends Component {
             {this.context.token === '' ? (
               <div className="auth-links">
                 {/* Dùng NavLink để tự động bắt trạng thái Active */}
-                <NavLink className="inform-link" to='/login'>Đăng nhập</NavLink>
+                <NavLink className="inform-link" to='/login' onClick={() => window.scrollTo(0, 0)}>Đăng nhập</NavLink>
                 <span className="divider">|</span>
-                <NavLink className="inform-link" to='/signup'>Đăng ký</NavLink>
+                <NavLink className="inform-link" to='/signup' onClick={() => window.scrollTo(0, 0)}>Đăng ký</NavLink>
                 <span className="divider">|</span>
-                <NavLink className="inform-link" to='/active'>Kích hoạt</NavLink>
+                <NavLink className="inform-link" to='/active' onClick={() => window.scrollTo(0, 0)}>Kích hoạt</NavLink>
               </div>
             ) : (
               <div className="user-info">
@@ -119,17 +119,17 @@ class Inform extends Component {
                 </span>
                 <span className="divider">|</span>
                 {/* Logout dùng Link vì nó thực hiện hành động xóa session, không cần giữ màu */}
-                <Link className="inform-link" to='/home' onClick={() => this.lnkLogoutClick()}>Đăng xuất</Link>
+                <Link className="inform-link" to='/home' onClick={() => { this.lnkLogoutClick(); window.scrollTo(0, 0); }}>Đăng xuất</Link>
                 <span className="divider">|</span>
-                <NavLink className="inform-link" to='/myprofile'>Hồ sơ của tôi</NavLink>
+                <NavLink className="inform-link" to='/myprofile' onClick={() => window.scrollTo(0, 0)}>Hồ sơ của tôi</NavLink>
                 <span className="divider">|</span>
-                <NavLink className="inform-link" to='/myorders'>Đơn hàng đã đặt</NavLink>
+                <NavLink className="inform-link" to='/myorders' onClick={() => window.scrollTo(0, 0)}>Đơn hàng đã đặt</NavLink>
               </div>
             )}
           </div>
 
           <div className="cart-section">
-            <NavLink className="inform-link cart-status" to='/mycart'>
+            <NavLink className="inform-link cart-status" to='/mycart' onClick={() => window.scrollTo(0, 0)}>
               GIỎ HÀNG CỦA BẠN <span className="cart-count">{this.context.mycart.length}</span>
             </NavLink>
           </div>

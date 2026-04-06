@@ -105,7 +105,7 @@ class Main extends Component {
           .footer-inner {
             max-width: 1300px;
             margin: 0 auto;
-            padding: 80px 24px 40px;
+            padding: 40px 24px 25px;
           }
 
           .footer-grid {
@@ -117,8 +117,8 @@ class Main extends Component {
           }
 
           .footer-brand h3 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 18px;
+            margin-bottom: 8px;
             color: var(--primary-orange);
           }
 
@@ -136,10 +136,10 @@ class Main extends Component {
           }
 
           .footer-col h4 {
-            font-size: 14px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             color: #fff;
             position: relative;
           }
@@ -306,10 +306,10 @@ class Main extends Component {
               <div className="footer-col">
                 <h4>Tài khoản</h4>
                 <ul>
-                  <li><Link to="/login">Đăng nhập</Link></li>
-                  <li><Link to="/signup">Đăng ký</Link></li>
-                  <li><Link to="/mycart">Giỏ hàng</Link></li>
-                  <li><Link to="/myorders">Đơn hàng</Link></li>
+                  <li><Link to="/login" onClick={() => window.scrollTo(0, 0)}>Đăng nhập</Link></li>
+                  <li><Link to="/signup" onClick={() => window.scrollTo(0, 0)}>Đăng ký</Link></li>
+                  <li><Link to="/mycart" onClick={() => window.scrollTo(0, 0)}>Giỏ hàng</Link></li>
+                  <li><Link to="/myorders" onClick={() => window.scrollTo(0, 0)}>Đơn hàng</Link></li>
                 </ul>
               </div>
 

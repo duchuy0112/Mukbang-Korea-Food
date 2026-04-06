@@ -12,14 +12,14 @@ class Home extends Component {
       activeLocationIndex: 0,
       locations: [
         {
-          name: "Korea Food - Quận 1",
+          name: "Mukbang Store - Quận 1",
           address: "123 Lê Lợi, P. Bến Thành, Quận 1, TP. HCM",
           phone: "028 3822 1234",
           time: "09:00 - 22:00 (Hàng ngày)",
           mapUrl: "https://maps.google.com/maps?q=123%20Lê%20Lợi,%20Bến%20Thành,%20Quận%201,%20Hồ%20Chí%20Minh&output=embed"
         },
         {
-          name: "Korea Food - Quận 5",
+          name: "Mukbang Store - Quận 5",
           address: "123 Nguyễn Văn Cừ, P. An Phú, Q. 5, TP. HCM",
           phone: "028 5411 5678",
           time: "10:00 - 22:30 (Hàng ngày)",
@@ -91,7 +91,7 @@ class Home extends Component {
 
           /* LOCATIONS */
           .locations-container { background: #fff; padding: 70px 0; }
-          .locations-content { max-width: 1250px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
+          .locations-content { max-width: 1250px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 0.8fr 2.2fr; gap: 40px; }
           .location-card {
             background: #fff; padding: 25px; border-radius: 18px; border: 1.5px solid #f0f0f0; transition: 0.3s; cursor: pointer; margin-bottom: 15px;
           }
@@ -134,7 +134,7 @@ class Home extends Component {
               <span className="sub-text">VỀ CHÚNG TÔI</span>
               <h2 className="about-title">Mukbang Korea Food - Tinh hoa ẩm thực <span className="highlight-orange">Hàn Quốc</span></h2>
               <p className="about-p">
-                Mukbang Korea Food tự hào mang đến cho thực khách những trải nghiệm ẩm thực Hàn Quốc đích thực ngay tại Việt Nam. 
+                Mukbang Korea Food tự hào mang đến cho thực khách những trải nghiệm ẩm thực Hàn Quốc đích thực ngay tại Việt Nam.
               </p>
               <p className="about-p">
                 Với đội ngũ đầu bếp tâm huyết và nguồn nguyên liệu chất lượng, chúng tôi không ngừng nỗ lực để mang đến những bữa ăn ngon miệng, ấm cúng cho bạn và gia đình.
@@ -206,7 +206,7 @@ class Home extends Component {
                 </div>
               ))}
             </div>
-            <div style={{ borderRadius: '25px', overflow: 'hidden', height: '400px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
+            <div style={{ borderRadius: '25px', overflow: 'hidden', height: '480px', boxShadow: '0 25px 60px rgba(0,0,0,0.12)', border: '1px solid #eee' }}>
               <iframe
                 title="Google Map"
                 src={this.state.locations[this.state.activeLocationIndex].mapUrl}

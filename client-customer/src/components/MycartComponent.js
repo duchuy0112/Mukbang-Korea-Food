@@ -13,7 +13,8 @@ class Mycart extends Component {
       txtName: undefined,
       txtPhone: undefined,
       txtAddress: undefined,
-      txtNote: ''
+      txtNote: '',
+      payMethod: 'COD' // 'COD' | 'MOMO' | 'BANK'
     };
   }
 
@@ -70,7 +71,7 @@ class Mycart extends Component {
 
     axios.post('/api/customer/checkout', body, config).then((res) => {
       if (res.data) {
-        alert('CHÚC MỪNG! ĐẶT HÀNG THÀNH CÔNG 🎉');
+        alert('CHÚC MỪNG! ĐẶT HÀNG THÀNH CÔNG 🎉\n' + (this.state.payMethod !== 'COD' ? 'Vui lòng đảm bảo bạn đã thực hiện chuyển khoản.' : 'Vui lòng chuẩn bị tiền mặt khi nhận hàng.'));
         this.context.setMycart([]);
         this.props.navigate('/home');
       } else {
@@ -227,6 +228,27 @@ class Mycart extends Component {
 
           .safety-tag { text-align: center; font-size: 10px; font-weight: 800; color: #aaa; margin-top: 25px; letter-spacing: 1px; text-transform: uppercase; }
 
+          /* QR SECTION */
+          .qr-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px dashed #d88960;
+            animation: fadeIn 0.4s ease;
+          }
+          @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+          
+          .qr-img { width: 180px; height: 180px; margin: 15px auto; display: block; border-radius: 8px; }
+          .qr-title { font-size: 15px; font-weight: 800; color: #b01e1e; margin-bottom: 8px; display: block; }
+          .qr-desc { font-size: 11px; color: #888; line-height: 1.4; }
+          .qr-bank-info { 
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;
+            font-size: 12px; text-align: left; line-height: 1.8;
+          }
+          .qr-bank-info b { color: #333; }
+
           @media (max-width: 900px) {
             .checkout-grid { grid-template-columns: 1fr; }
           }
@@ -329,21 +351,21 @@ class Mycart extends Component {
 
                 <h3 className="pay-method-title">PHƯƠNG THỨC THANH TOÁN</h3>
                 <div className="method-list">
-                  <div className="method-item active">
+                  <div className={`method-item ${this.state.payMethod === 'COD' ? 'active' : ''}`} onClick={() => this.setState({ payMethod: 'COD' })}>
                     <div className="method-left">
                       <span>💵</span>
                       <span>Tiền mặt (COD)</span>
                     </div>
                     <div className="radio-indicator"></div>
                   </div>
-                  <div className="method-item">
+                  <div className={`method-item ${this.state.payMethod === 'MOMO' ? 'active' : ''}`} onClick={() => this.setState({ payMethod: 'MOMO' })}>
                     <div className="method-left">
                       <span>📱</span>
                       <span>Ví MoMo</span>
                     </div>
                     <div className="radio-indicator"></div>
                   </div>
-                  <div className="method-item">
+                  <div className={`method-item ${this.state.payMethod === 'BANK' ? 'active' : ''}`} onClick={() => this.setState({ payMethod: 'BANK' })}>
                     <div className="method-left">
                       <span>🏦</span>
                       <span>Chuyển khoản</span>
@@ -351,6 +373,41 @@ class Mycart extends Component {
                     <div className="radio-indicator"></div>
                   </div>
                 </div>
+
+                {/* QR DISPLAY SECTION */}
+                {this.state.payMethod === 'BANK' && (
+                  <div className="qr-section">
+                    <span className="qr-title">Hệ thống VietQR</span>
+                    <p className="qr-desc">Vui lòng quét mã bên dưới để thanh toán đơn hàng</p>
+                    <img 
+                      src={`https://img.vietqr.io/image/MB-1230111999999-compact.png?amount=${totalPayable}&addInfo=KH%20${this.context.customer?.name}%20THANH%20TOAN%20MUKBANG&accountName=MUKBANG%20KOREA%20FOOD`} 
+                      alt="VietQR Bank" 
+                      className="qr-img" 
+                    />
+                    <div className="qr-bank-info">
+                      <div>Ngân hàng: <b>MB Bank (Quân Đội)</b></div>
+                      <div>STK: <b>1230111999999</b></div>
+                      <div>Chủ TK: <b>MUKBANG KOREA FOOD</b></div>
+                    </div>
+                  </div>
+                )}
+
+                {this.state.payMethod === 'MOMO' && (
+                  <div className="qr-section">
+                    <span className="qr-title">Thanh toán MoMo</span>
+                    <p className="qr-desc">Quét mã để thanh toán qua ứng dụng Ví MoMo</p>
+                    {/* Placeholder MoMo QR - trong thực tế sẽ là QR động từ Gateway */}
+                    <img 
+                      src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=2|99|0901234567|MUKBANG%20KOREA|contact@mukbang.vn|0|0|50000" 
+                      alt="MoMo QR" 
+                      className="qr-img" 
+                    />
+                    <div className="qr-bank-info" style={{textAlign:'center'}}>
+                      <div>Số điện thoại: <b>0901 234 567</b></div>
+                      <div>Người nhận: <b>MUKBANG KOREA FOOD</b></div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="summary-section">
                   <div className="summary-row">
