@@ -26,7 +26,7 @@ class Home extends Component {
     axios.get('/api/admin/orders', { headers: { 'x-access-token': this.context.token } })
       .then((res) => {
         const orders = Array.isArray(res.data) ? res.data : [];
-        this.setState({ 
+        this.setState({
           totalOrders: orders.length,
           recentOrders: orders.slice(0, 5) // Lấy 5 đơn hàng gần nhất
         });
@@ -36,7 +36,7 @@ class Home extends Component {
     axios.get('/api/admin/products', { headers: { 'x-access-token': this.context.token } })
       .then((res) => {
         const prods = Array.isArray(res.data) ? res.data : [];
-        this.setState({ 
+        this.setState({
           topSelling: prods[0] || null,
           trendingProducts: prods.slice(1, 4) // Lấy 3 món tiếp theo
         });
@@ -253,23 +253,11 @@ class Home extends Component {
           
           .status-chip { padding: 6px 14px; border-radius: 50px; font-weight: 900; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-          .chart-placeholder {
+          .chart-container-svg {
             flex: 1;
-            background: radial-gradient(circle at 50% 50%, #fefefe 0%, #f9f9f9 100%);
-            border-radius: 25px;
-            border: 1px solid #f0f0f0;
-            display: flex; align-items: flex-end; justify-content: space-around;
-            padding: 50px; gap: 15px;
-          }
-          .bar {
-            width: 10%; background: #eee; border-radius: 8px 8px 4px 4px;
-            transition: 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-          }
-          .bar::after {
-            content: attr(data-month);
-            position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
-            font-size: 11px; font-weight: 900; color: #bbb;
+            width: 100%;
+            height: 250px;
+            margin-top: 20px;
           }
         `}</style>
 
@@ -286,21 +274,21 @@ class Home extends Component {
               {this.state.totalSales?.toLocaleString()} <small>đ</small>
             </div>
             <div className="stat-badge">+12.5% <small>so với tháng trước</small></div>
-            <div style={{position:'absolute', bottom:'-10px', right:'-10px', opacity:0.1, fontSize:'80px'}}>💰</div>
+            <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', opacity: 0.1, fontSize: '80px' }}>💰</div>
           </div>
 
           <div className="stat-card card-orders">
             <div className="stat-inner-label">TỔNG ĐƠN HÀNG</div>
             <div className="stat-value">{this.state.totalOrders?.toLocaleString()}</div>
             <div className="stat-badge">+8.2% <small>hành trình đơn hàng</small></div>
-            <div style={{position:'absolute', bottom:'-10px', right:'-10px', opacity:0.1, fontSize:'80px'}}>🛍️</div>
+            <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', opacity: 0.1, fontSize: '80px' }}>🛍️</div>
           </div>
 
           <div className="stat-card card-customers">
             <div className="stat-inner-label">KHÁCH HÀNG MỚI</div>
             <div className="stat-value">{this.state.newCustomers}</div>
-            <div className="stat-badge" style={{color:'#c32d20'}}>+15% <small>tăng trưởng</small></div>
-            <div style={{position:'absolute', bottom:'-10px', right:'-10px', opacity:0.1, fontSize:'60px'}}>👥</div>
+            <div className="stat-badge" style={{ color: '#c32d20' }}>+15% <small>tăng trưởng</small></div>
+            <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', opacity: 0.1, fontSize: '60px' }}>👥</div>
           </div>
 
           <div className="top-selling-card">
@@ -309,13 +297,13 @@ class Home extends Component {
                 <img src={'data:image/jpg;base64,' + this.state.topSelling.image} alt="Product" />
               ) : "🍱"}
             </div>
-            <div style={{lineHeight: 1.2}}>
-              <div className="stat-inner-label" style={{color:'#888'}}>BÁN CHẠY NHẤT</div>
-              <div style={{fontSize: '18px', fontWeight: 900, color: '#1a1a1a', margin: '4px 0'}}>
-                 {this.state.topSelling?.name || "Kimchi Jjigae"}
+            <div style={{ lineHeight: 1.2 }}>
+              <div className="stat-inner-label" style={{ color: '#888' }}>BÁN CHẠY NHẤT</div>
+              <div style={{ fontSize: '18px', fontWeight: 900, color: '#1a1a1a', margin: '4px 0' }}>
+                {this.state.topSelling?.name || "Kimchi Jjigae"}
               </div>
-              <div style={{fontSize: '12px', fontWeight: 800, color: '#b3261e'}}>
-                 452 đơn <small>tuần này</small>
+              <div style={{ fontSize: '12px', fontWeight: 800, color: '#b3261e' }}>
+                452 đơn <small>tuần này</small>
               </div>
             </div>
           </div>
@@ -328,16 +316,45 @@ class Home extends Component {
             <div className="panel-sub">Theo dõi hiệu suất doanh thu hàng tháng</div>
 
             <div className="revenue-legend">
-               <div className="legend-item"><div className="dot" style={{background:'#c32d20'}}></div> Trực tuyến</div>
-               <div className="legend-item"><div className="dot" style={{background:'#8b4513'}}></div> Mang về</div>
+              <div className="legend-item"><div className="dot" style={{ background: '#c32d20' }}></div> Trực tuyến</div>
+              <div className="legend-item"><div className="dot" style={{ background: '#8b4513' }}></div> Mang về</div>
             </div>
 
-            <div className="chart-placeholder">
-               <div className="bar" style={{height:'30%'}} data-month="JAN"></div>
-               <div className="bar" style={{height:'50%'}} data-month="FEB"></div>
-               <div className="bar" style={{height:'85%', background:'#c32d20'}} data-month="MAR"></div>
-               <div className="bar" style={{height:'65%'}} data-month="APR"></div>
-               <div className="bar" style={{height:'45%'}} data-month="MAY"></div>
+            <div className="chart-container-svg">
+              <svg width="100%" height="100%" viewBox="0 0 600 220" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+                <defs>
+                  <linearGradient id="homeWaveGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgba(195,45,32,0.3)" />
+                    <stop offset="100%" stopColor="rgba(195,45,32,0)" />
+                  </linearGradient>
+                  <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+                    <feOffset dx="0" dy="8" result="offsetblur" />
+                    <feComponentTransfer><feFuncA type="linear" slope="0.2" /></feComponentTransfer>
+                    <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                  </filter>
+                </defs>
+
+                {/* Decorative Grid Lines */}
+                {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
+                  <line key={i} x1="0" y1={200 - 180 * f} x2="600" y2={200 - 180 * f} stroke="#f0f0f0" strokeWidth="1" strokeDasharray="5,5" />
+                ))}
+
+                {/* Wave Path */}
+                <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50 L 600 200 L 0 200 Z" fill="url(#homeWaveGrad)" />
+
+                <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50" fill="none" stroke="#c32d20" strokeWidth="5" strokeLinecap="round" filter="url(#softShadow)" />
+
+                {/* Animated Dots */}
+                <circle cx="200" cy="80" r="6" fill="#fff" stroke="#c32d20" strokeWidth="3" />
+                <circle cx="400" cy="120" r="6" fill="#fff" stroke="#c32d20" strokeWidth="3" />
+                <circle cx="600" cy="50" r="6" fill="#fff" stroke="#c32d20" strokeWidth="3" />
+
+                {/* Month Labels */}
+                {['T1', 'T2', 'T3', 'T4', 'T5', 'T6'].map((m, i) => (
+                  <text key={i} x={i * 120} y="215" textAnchor="middle" fill="#ccc" fontSize="12" fontWeight="800">{m}</text>
+                ))}
+              </svg>
             </div>
           </div>
 
@@ -347,15 +364,15 @@ class Home extends Component {
 
             {this.state.trendingProducts.map((p, idx) => (
               <a href="#" key={p._id} className="trend-item">
-                <div className="prod-img-mini" style={{width:'50px', height:'50px', fontSize:'20px'}}>
+                <div className="prod-img-mini" style={{ width: '50px', height: '50px', fontSize: '20px' }}>
                   <img src={'data:image/jpg;base64,' + p.image} alt={p.name} />
                 </div>
-                <div style={{lineHeight: 1.2}}>
-                   <div style={{fontWeight: 800, fontSize:'14px'}}>{p.name}</div>
-                   <div style={{fontSize: '11px', color: '#888'}}>124 đơn hàng hôm nay</div>
-                   <div style={{fontSize: '12px', fontWeight: 900, color: '#ff8f2d', marginTop: '3px'}}>
-                     {p.price?.toLocaleString()} đ
-                   </div>
+                <div style={{ lineHeight: 1.2 }}>
+                  <div style={{ fontWeight: 800, fontSize: '14px' }}>{p.name}</div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>124 đơn hàng hôm nay</div>
+                  <div style={{ fontSize: '12px', fontWeight: 900, color: '#ff8f2d', marginTop: '3px' }}>
+                    {p.price?.toLocaleString()} đ
+                  </div>
                 </div>
               </a>
             ))}
@@ -366,11 +383,11 @@ class Home extends Component {
 
         {/* RECENT ORDERS TABLE */}
         <div className="recent-orders-panel">
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div className="panel-title">Đơn hàng gần nhất</div>
-            <a href="/admin/order" style={{color:'#b3261e', textDecoration:'none', fontSize:'13px', fontWeight:800}}>Xem tất cả lịch sử →</a>
+            <a href="/admin/order" style={{ color: '#b3261e', textDecoration: 'none', fontSize: '13px', fontWeight: 800 }}>Xem tất cả lịch sử →</a>
           </div>
-          
+
           <table className="order-table">
             <thead>
               <tr>
@@ -384,10 +401,10 @@ class Home extends Component {
             <tbody>
               {this.state.recentOrders.map((o) => (
                 <tr key={o._id}>
-                  <td style={{fontWeight: 800, color: '#333'}}>#{o._id.substring(o._id.length - 8)}</td>
-                  <td style={{fontWeight: 700}}>{o.customer?.name}</td>
-                  <td style={{color: '#666'}}>{new Date(o.cdate).toLocaleDateString()}</td>
-                  <td style={{fontWeight: 900, color: '#1a1a1a'}}>{o.total.toLocaleString()}đ</td>
+                  <td style={{ fontWeight: 800, color: '#333' }}>#{o._id.substring(o._id.length - 8)}</td>
+                  <td style={{ fontWeight: 700 }}>{o.customer?.name}</td>
+                  <td style={{ color: '#666' }}>{new Date(o.cdate).toLocaleDateString()}</td>
+                  <td style={{ fontWeight: 900, color: '#1a1a1a' }}>{o.total.toLocaleString()}đ</td>
                   <td>
                     <span className="status-chip" style={{
                       background: o.status === 'PENDING' ? '#fff8e1' : (o.status === 'APPROVED' ? '#e8f5e9' : '#ffebee'),

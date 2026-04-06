@@ -128,49 +128,86 @@ class RevenueReport extends Component {
       .slice(0, 5);
   }
 
-  // ─── SVG BAR CHART ───
-  renderBarChart(data, width = 700, height = 260) {
+  // ─── SVG WAVE (LINE) CHART ───
+  renderWaveChart(data, width = 740, height = 280) {
     if (data.length === 0) return <p style={{ textAlign: 'center', color: '#999' }}>Chưa có dữ liệu</p>;
-    const maxVal = Math.max(...data.map(d => d[1].revenue));
-    const barWidth = Math.min(60, (width - 80) / data.length - 12);
-    const chartH = height - 65; /* Khống chế lại chiều cao để dư nhiều đỉnh phía trên hơn */
+    const maxVal = Math.max(...data.map(d => d[1].revenue)) || 1;
+    
+    const chartW = width - 100;
+    const chartH = height - 100;
+    const offsetX = 70;
+    const offsetY = 45;
+
+    const points = data.map((d, i) => {
+      const x = offsetX + (i * (chartW / (data.length - 1 || 1)));
+      const y = offsetY + (chartH - (d[1].revenue / maxVal) * chartH);
+      return { x, y };
+    });
+
+    // Create smooth Cubic Bezier path
+    let pathD = `M ${points[0].x} ${points[0].y}`;
+    if (points.length > 1) {
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cpX = p0.x + (p1.x - p0.x) / 2;
+        pathD += ` C ${cpX} ${p0.y}, ${cpX} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+    }
+
+    const areaD = `${pathD} L ${points[points.length - 1].x} ${offsetY + chartH} L ${points[0].x} ${offsetY + chartH} Z`;
 
     return (
-      <svg width="100%" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Biểu đồ doanh thu theo tháng">
-        <title>Biểu đồ cột doanh thu theo tháng</title>
+      <svg width="100%" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Biểu đồ sóng doanh thu">
+        <title>Biểu đồ sóng doanh thu theo tháng</title>
+        <defs>
+          <linearGradient id="wave-grad-main" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(211,47,47,0.3)" />
+            <stop offset="100%" stopColor="rgba(211,47,47,0)" />
+          </linearGradient>
+          <linearGradient id="line-grad-main" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#ff9f43" />
+            <stop offset="100%" stopColor="#d32f2f" />
+          </linearGradient>
+          <filter id="wave-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+            <feOffset dx="0" dy="4" result="offsetblur" />
+            <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Grid Lines */}
         {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
           <g key={i}>
-            <line x1="60" y1={chartH - chartH * f + 25} x2={width - 10} y2={chartH - chartH * f + 25} stroke="#f0f0f0" strokeWidth="1" />
-            <text x="55" y={chartH - chartH * f + 29} textAnchor="end" fill="#bbb" fontSize="10">
+            <line x1={offsetX} y1={offsetY + chartH - chartH * f} x2={width - 20} y2={offsetY + chartH - chartH * f} stroke="#f0f0f0" strokeWidth="1" strokeDasharray="4 4" />
+            <text x={offsetX - 10} y={offsetY + chartH - chartH * f + 4} textAnchor="end" fill="#bbb" fontSize="11" fontWeight="600">
               {(maxVal * f / 1000).toFixed(0)}k
             </text>
           </g>
         ))}
-        {data.map((d, i) => {
-          const barH = maxVal > 0 ? (d[1].revenue / maxVal) * chartH : 0;
-          const x = 70 + i * ((width - 90) / data.length);
-          const y = chartH - barH + 25; /* Hệ số Dịch đồ thị xuống 25px */
-          return (
-            <g key={i}>
-              <defs>
-                <linearGradient id={`bar-grad-${i}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ff9f43" />
-                  <stop offset="100%" stopColor="#d32f2f" />
-                </linearGradient>
-              </defs>
-              <rect x={x} y={y} width={barWidth} height={barH} rx="6" ry="6" fill={`url(#bar-grad-${i})`}>
-                <animate attributeName="height" from="0" to={barH} dur="0.6s" fill="freeze" />
-                <animate attributeName="y" from={chartH + 25} to={y} dur="0.6s" fill="freeze" />
-              </rect>
-              <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fill="#d32f2f" fontSize="11" fontWeight="800">
-                {(d[1].revenue / 1000).toFixed(0)}k
-              </text>
-              <text x={x + barWidth / 2} y={chartH + 43} textAnchor="middle" fill="#666" fontSize="11" fontWeight="600">
-                {d[0]}
-              </text>
-            </g>
-          );
-        })}
+
+        {/* Area Fill */}
+        <path d={areaD} fill="url(#wave-grad-main)" />
+
+        {/* Wave Line */}
+        <path d={pathD} fill="none" stroke="url(#line-grad-main)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" filter="url(#wave-shadow)" />
+
+        {/* Data points & Labels */}
+        {points.map((p, i) => (
+          <g key={i}>
+            <circle cx={p.x} cy={p.y} r="6" fill="#fff" stroke="#d32f2f" strokeWidth="3" />
+            <text x={p.x} y={p.y - 15} textAnchor="middle" fill="#d32f2f" fontSize="12" fontWeight="900">
+               {(data[i][1].revenue / 1000).toFixed(0)}k
+            </text>
+            <text x={p.x} y={offsetY + chartH + 30} textAnchor="middle" fill="#555" fontSize="11" fontWeight="700">
+              {data[i][0]}
+            </text>
+          </g>
+        ))}
       </svg>
     );
   }
@@ -431,7 +468,7 @@ class RevenueReport extends Component {
             </header>
             
             <figure style={{ margin: 0, padding: 0 }}>
-              {this.renderBarChart(monthlyData)}
+              {this.renderWaveChart(monthlyData)}
               <figcaption className="sr-only">
                 Biểu đồ thể hiện doanh thu theo từng tháng của thương hiệu Mukbang Korea Food
               </figcaption>
