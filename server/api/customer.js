@@ -13,6 +13,10 @@ router.get('/categories', async function (req, res) {
 });
 
 // product
+router.get('/products', async function (req, res) {
+  const products = await ProductDAO.selectAll();
+  res.json(products);
+});
 router.get('/products/new', async function (req, res) {
   const products = await ProductDAO.selectTopNew(3);
   res.json(products);
@@ -36,6 +40,7 @@ router.post('/signup', async function (req, res) {
   const name = req.body.name;
   const phone = req.body.phone;
   const email = req.body.email;
+  const address = req.body.address;
 
   const dbCust = await CustomerDAO.selectByUsernameOrEmail(username, email);
 
@@ -51,6 +56,7 @@ router.post('/signup', async function (req, res) {
       name: name,
       phone: phone,
       email: email,
+      address: address,
       token: token,
       active: 0
     };
@@ -61,7 +67,7 @@ router.post('/signup', async function (req, res) {
       const sendmail = await EmailUtil.send(
         email,
         'Signup',
-        'Please click the link to active your account: http://localhost:3001/active/' + token
+        'Please use the following information to active your account at http://localhost:3001/active\n\nID: ' + result._id + '\nToken: ' + token
       );
 
       if (sendmail) {
@@ -164,6 +170,7 @@ router.put('/customers/:id', JwtUtil.checkToken, async function (req, res) {
   const name = req.body.name;
   const phone = req.body.phone;
   const email = req.body.email;
+  const address = req.body.address;
 
   const customer = {
     _id: _id,
@@ -171,7 +178,8 @@ router.put('/customers/:id', JwtUtil.checkToken, async function (req, res) {
     password: password,
     name: name,
     phone: phone,
-    email: email
+    email: email,
+    address: address
   };
 
   const result = await CustomerDAO.update(customer);

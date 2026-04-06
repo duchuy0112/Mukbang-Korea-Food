@@ -22,6 +22,7 @@ const CustomerDAO = {
     const result = await Models.Customer.findOneAndUpdate(query, newvalues, {
       new: true,
     });
+    return result;
   },
 
   async selectByUsernameAndPassword(username, password) {
@@ -42,7 +43,8 @@ const CustomerDAO = {
       password: customer.password,
       name: customer.name,
       phone: customer.phone,
-      email: customer.email
+      email: customer.email,
+      address: customer.address
     };
 
     const result = await Models.Customer.findByIdAndUpdate(

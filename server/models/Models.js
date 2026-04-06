@@ -26,6 +26,7 @@ const CustomerSchema = mongoose.Schema(
     name: String,
     phone: String,
     email: String,
+    address: String,
     active: Number,
     token: String
   },
@@ -38,6 +39,7 @@ const ProductSchema = mongoose.Schema(
     name: String,
     price: Number,
     image: String,
+    description: String,
     cdate: Number,
     category: CategorySchema
   },
@@ -71,10 +73,27 @@ const Customer = mongoose.model('Customer', CustomerSchema);
 const Product = mongoose.model('Product', ProductSchema);
 const Order = mongoose.model('Order', OrderSchema);
 
+const ConfigSchema = mongoose.Schema(
+  {
+    _id: mongoose.Schema.Types.ObjectId,
+    shopName: String,
+    slogan: String,
+    address: String,
+    phone: String,
+    email: String,
+    facebook: String,
+    instagram: String,
+    openingHours: String
+  },
+  { versionKey: false }
+);
+const Config = mongoose.model('Config', ConfigSchema);
+
 module.exports = {
   Admin,
   Category,
   Customer,
   Product,
-  Order
+  Order,
+  Config
 };

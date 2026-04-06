@@ -128,6 +128,7 @@ const ProductDAO = {
       name: product.name,
       price: product.price,
       image: product.image,
+      description: product.description,
       category: product.category,
     };
 
@@ -143,6 +144,12 @@ const ProductDAO = {
   async delete(_id) {
     const result = await Models.Product.findByIdAndDelete(_id);
     return result;
+  },
+  
+  async selectAll() {
+    const query = {};
+    const products = await Models.Product.find(query).exec();
+    return products;
   },
 
    async selectByID(_id) {

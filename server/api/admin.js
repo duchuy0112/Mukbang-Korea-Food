@@ -11,6 +11,7 @@ const CategoryDAO = require('../models/CategoryDAO');
 const ProductDAO = require('../models/ProductDAO');
 const OrderDAO = require('../models/OrderDAO');
 const CustomerDAO = require('../models/CustomerDAO');
+const ConfigDAO = require('../models/ConfigDAO');
 // ================== AUTH ==================
 router.post('/login', async function (req, res) {
   const username = req.body.username;
@@ -91,6 +92,7 @@ router.post('/products', JwtUtil.checkToken, async function (req, res) {
   const price = req.body.price;
   const cid = req.body.category;
   const image = req.body.image;
+  const description = req.body.description;
   const now = new Date().getTime();
 
   const category = await CategoryDAO.selectByID(cid);
@@ -98,6 +100,7 @@ router.post('/products', JwtUtil.checkToken, async function (req, res) {
     name: name,
     price: price,
     image: image,
+    description: description,
     cdate: now,
     category: category
   };
@@ -112,6 +115,7 @@ router.put('/products/:id', JwtUtil.checkToken, async function (req, res) {
   const price = req.body.price;
   const cid = req.body.category;
   const image = req.body.image;
+  const description = req.body.description;
   const now = new Date().getTime();
 
   const category = await CategoryDAO.selectByID(cid);
@@ -120,6 +124,7 @@ router.put('/products/:id', JwtUtil.checkToken, async function (req, res) {
     name: name,
     price: price,
     image: image,
+    description: description,
     cdate: now,
     category: category
   };
@@ -190,6 +195,38 @@ router.get('/customers/sendmail/:id', JwtUtil.checkToken, async function (req, r
   } else {
     res.json({ success: false, message: 'Not exists customer' });
   }
+});
+// ================== CONFIG ==================
+router.get('/configs', JwtUtil.checkToken, async function (req, res) {
+  let config = await ConfigDAO.select();
+  if (!config) {
+    config = {
+      shopName: 'Mukbang Korea Food',
+      slogan: 'Hương vị Hàn Quốc đích thực',
+      address: '123 Đường ABC, Hà Nội',
+      phone: '0123 456 789',
+      email: 'contact@mukbang.com',
+      facebook: 'facebook.com/mukbang',
+      instagram: 'instagram.com/mukbang',
+      openingHours: '09:00 - 22:00'
+    };
+    await ConfigDAO.insert(config);
+    config = await ConfigDAO.select();
+  }
+  res.json(config);
+});
+
+router.put('/configs', JwtUtil.checkToken, async function (req, res) {
+  const config = req.body;
+  const result = await ConfigDAO.update(config);
+  res.json(result);
+});
+
+router.put('/password', JwtUtil.checkToken, async function (req, res) {
+  const username = req.body.username;
+  const newPassword = req.body.newPassword;
+  const result = await AdminDAO.updatePassword(username, newPassword);
+  res.json(result);
 });
 // ================== EXPORT ==================
 module.exports = router;
