@@ -129,6 +129,7 @@ const ProductDAO = {
       price: product.price,
       image: product.image,
       description: product.description,
+      ingredients: product.ingredients,
       category: product.category,
     };
 

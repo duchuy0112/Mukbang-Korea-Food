@@ -40,6 +40,7 @@ const ProductSchema = mongoose.Schema(
     price: Number,
     image: String,
     description: String,
+    ingredients: String,
     cdate: Number,
     category: CategorySchema
   },
