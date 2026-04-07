@@ -126,6 +126,9 @@ class Product extends Component {
           </div>
           <div className="card-details">
             <h3 className="card-title">{item.name}</h3>
+            <p className="card-description">
+              {item.description || "Món ăn chuẩn vị Hàn Quốc, được chế biến tâm huyết bởi đầu bếp chuyên nghiệp."}
+            </p>
             <p className="card-price">{item.price?.toLocaleString()} VNĐ</p>
             <button className="card-add-btn">Thêm vào giỏ</button>
           </div>
@@ -194,6 +197,11 @@ class Product extends Component {
           
           .card-details { padding: 22px; text-align: left; }
           .card-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; color: #1a1a1a; display: block; height: 48px; overflow: hidden; line-height: 1.4; }
+          .card-description { 
+            font-size: 13px; color: #777; line-height: 1.5; margin-bottom: 12px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            height: 38px;
+          }
           .card-price { font-size: 18px; font-weight: 900; color: var(--primary-red); margin-bottom: 18px; }
           
           .card-add-btn {

@@ -283,7 +283,7 @@ class Main extends Component {
             <div className="footer-grid">
               {/* Brand */}
               <div className="footer-brand">
-                <h3>🇰🇷 Korea Food Mukbang Store</h3>
+                <h3>🇰🇷 Mukbang Store - Korea Food</h3>
                 <p className="footer-brand-sub">Ẩm Thực Hàn Quốc Chính Hiệu</p>
                 <p>
                   Mang đến cho bạn trải nghiệm ẩm thực Hàn Quốc đích thực với nguyên liệu

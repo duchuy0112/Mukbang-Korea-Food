@@ -97,18 +97,32 @@ class ProductDetail extends Component {
           }
 
           /* --- PURCHASE BOX --- */
-          .purchase-box { background: #fafafa; padding: 30px; border-radius: 24px; border: 1px solid #f0f0f0; margin-bottom: 40px; }
-          .qty-picker { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
-          .qty-label { font-weight: 800; font-size: 13px; color: #888; text-transform: uppercase; }
-          .qty-control { display: flex; align-items: center; background: #fff; border-radius: 12px; padding: 4px; border: 1px solid #eee; }
-          .qty-btn { width: 40px; height: 40px; border: none; background: #fff; font-size: 18px; border-radius: 10px; cursor: pointer; transition: 0.2s; color: #444; }
-          .qty-btn:hover { background: #f5f5f5; color: #000; }
-          .qty-val { width: 50px; text-align: center; font-weight: 800; font-size: 16px; background: transparent; border: none; outline: none; }
+          .purchase-box { display: flex; align-items: center; gap: 20px; margin-bottom: 45px; }
+          .qty-control { 
+            display: flex; align-items: center; background: #f5f5f7; border-radius: 50px; 
+            padding: 8px 15px; border: none; width: 140px; justify-content: space-between;
+          }
+          .qty-btn { 
+            width: 32px; height: 32px; border: none; background: transparent; 
+            font-size: 20px; cursor: pointer; transition: 0.2s; color: #333; 
+            display: flex; align-items: center; justify-content: center; font-weight: 500;
+          }
+          .qty-btn:hover { color: var(--primary-red); transform: scale(1.2); }
+          .qty-val { 
+            width: 40px; text-align: center; font-weight: 700; font-size: 17px; 
+            background: transparent; border: none; outline: none; color: #1d1d1f;
+          }
 
           .add-to-cart-btn {
-             width: 100%; background: #1a1a1a; color: white; border: none; padding: 18px; border-radius: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.3s;
+             flex: 1; height: 64px; background: #a62626; color: white; border: none; 
+             border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; 
+             transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; 
+             justify-content: center; gap: 12px; box-shadow: 0 10px 25px rgba(166, 38, 38, 0.25);
           }
-          .add-to-cart-btn:hover { background: var(--accent-gradient); transform: translateY(-3px); box-shadow: 0 15px 30px rgba(211, 47, 47, 0.2); }
+          .add-to-cart-btn:hover { 
+            background: #8e1e1e; transform: translateY(-4px) scale(1.02); 
+            box-shadow: 0 15px 35px rgba(166, 38, 38, 0.35); 
+          }
 
           /* --- TABS --- */
           .tabs-row { display: flex; gap: 40px; border-bottom: 2px solid #f0f0f0; margin-bottom: 30px; }
@@ -160,41 +174,43 @@ class ProductDetail extends Component {
             </div>
 
             <p className="detail-short-desc">
-              Một tuyệt tác ẩm thực được nghệ nhân chế biến từ những nguyên liệu tinh túy nhất, mang đến hương vị bùng nổ của Seoul ngay tại bàn ăn của bạn.
+              {prod.description || "Món ăn chuẩn vị Hàn Quốc, được chế biến tâm huyết từ các đầu bếp hàng đầu với 15 năm kinh nghiệm."}
             </p>
 
+            {prod.ingredients && (
+              <div style={{marginBottom: '30px', fontSize: '14px', color: '#888', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <span style={{color: '#D32F2F', fontWeight: '800'}}>THÀNH PHẦN:</span> {prod.ingredients.length > 80 ? prod.ingredients.substring(0, 77) + '...' : prod.ingredients}
+              </div>
+            )}
+
             <div className="purchase-box">
-              <div className="qty-picker">
-                <span className="qty-label">Số lượng:</span>
-                <div className="qty-control">
-                  <button className="qty-btn" onClick={() => this.handleQtyChange(-1)}>−</button>
-                  <input className="qty-val" type="text" readOnly value={this.state.txtQuantity} />
-                  <button className="qty-btn" onClick={() => this.handleQtyChange(1)}>+</button>
-                </div>
+              <div className="qty-control">
+                <button className="qty-btn" onClick={() => this.handleQtyChange(-1)}>−</button>
+                <input className="qty-val" type="text" readOnly value={this.state.txtQuantity} />
+                <button className="qty-btn" onClick={() => this.handleQtyChange(1)}>+</button>
               </div>
 
               <button className="add-to-cart-btn" onClick={(e) => this.btnAdd2CartClick(e)}>
-                THÊM VÀO GIỎ HÀNG — { (prod.price * this.state.txtQuantity).toLocaleString() } VNĐ
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Thêm vào giỏ hàng
               </button>
             </div>
 
             <div className="tabs-row">
-               <div className={`tab-item ${this.state.activeTab === 'desc' ? 'active' : ''}`} onClick={() => this.setState({activeTab: 'desc'})}>Mô tả chi tiết</div>
-               <div className={`tab-item ${this.state.activeTab === 'info' ? 'active' : ''}`} onClick={() => this.setState({activeTab: 'info'})}>Thông tin thêm</div>
+               <div className={`tab-item ${this.state.activeTab === 'info' ? 'active' : ''}`} onClick={() => this.setState({activeTab: 'info'})}>Thông tin dinh dưỡng & Phục vụ</div>
             </div>
 
-            {this.state.activeTab === 'desc' ? (
-               <div className="tab-pane">
-                  {prod.description || "Món ăn chuẩn vị Hàn Quốc, được chế biến tâm huyết từ các đầu bếp hàng đầu với 15 năm kinh nghiệm. Đảm bảo vệ sinh an toàn thực phẩm và giữ nguyên hương vị truyền thống."}
-               </div>
-            ) : (
-               <div className="tab-pane">
-                  • <b>Nguyên liệu:</b> Nhập khẩu 100% từ Hàn Quốc<br/>
-                  • <b>Thời gian chuẩn bị:</b> 10-15 phút<br/>
-                  • <b>Đóng gói:</b> Hộp giấy bảo vệ môi trường, giữ nhiệt 45 phút<br/>
-                  • <b>Giao hàng:</b> Miễn phí trong bán kính 3km
-               </div>
-            )}
+            <div className="tab-pane">
+               • <b>Nguyên liệu chính:</b> {prod.ingredients || "Nguyên liệu tươi sạch nhập khẩu hàng ngày."}<br/>
+               • <b>Thời gian chuẩn bị:</b> 10-15 phút<br/>
+               • <b>Đóng gói:</b> Hộp giấy bảo vệ môi trường, giữ nhiệt 45 phút<br/>
+               • <b>Ghi chú:</b> Món ăn ngon nhất khi dùng nóng.<br/>
+               • <b>Giao hàng:</b> Miễn phí trong bán kính 3km
+            </div>
           </div>
         </div>
       </div>

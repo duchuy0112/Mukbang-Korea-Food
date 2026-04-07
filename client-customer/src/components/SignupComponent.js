@@ -132,12 +132,12 @@ class Signup extends Component {
 
           {/* Form */}
           <form onSubmit={(e) => this.btnSignupClick(e)} style={styles.form}>
-            {this.renderInput('Tên đăng nhập', 'txtUsername', 'text', 'Nhập tên đăng nhập', '👤')}
-            {this.renderInput('Mật khẩu', 'txtPassword', 'password', 'Nhập mật khẩu', '🔒')}
-            {this.renderInput('Họ và tên', 'txtName', 'text', 'Nhập họ và tên đầy đủ', '✨')}
-            {this.renderInput('Số điện thoại', 'txtPhone', 'tel', 'Nhập số điện thoại', '📱')}
-            {this.renderInput('Email', 'txtEmail', 'email', 'example@gmail.com', '📧')}
-            {this.renderInput('Địa chỉ', 'txtAddress', 'text', 'Nhập địa chỉ của bạn', '🏠')}
+            {this.renderInput('Tên đăng nhập', 'txtUsername', 'text', 'Nhập tên đăng nhập', '👤', true)}
+            {this.renderInput('Mật khẩu', 'txtPassword', 'password', 'Nhập mật khẩu', '🔒', true)}
+            {this.renderInput('Họ và tên', 'txtName', 'text', 'Nhập họ và tên đầy đủ', '✨', true)}
+            {this.renderInput('Số điện thoại', 'txtPhone', 'tel', 'Nhập số điện thoại', '📱', true)}
+            {this.renderInput('Email', 'txtEmail', 'email', 'example@gmail.com', '📧', true)}
+            {this.renderInput('Địa chỉ', 'txtAddress', 'text', 'Nhập địa chỉ của bạn', '🏠', true)}
 
             <button
               type="submit"
@@ -158,12 +158,12 @@ class Signup extends Component {
     );
   }
 
-  renderInput(label, stateKey, type, placeholder, icon) {
+  renderInput(label, stateKey, type, placeholder, icon, required = false) {
     return (
       <div style={styles.inputGroup}>
         <label style={styles.label}>
           <span style={styles.labelIcon}>{icon}</span>
-          {label}
+          {label} {required && <span style={{color: '#FF5722', marginLeft: '4px'}}>*</span>}
         </label>
         <input
           className="signup-input"
@@ -172,6 +172,7 @@ class Signup extends Component {
           value={this.state[stateKey]}
           onChange={(e) => this.setState({ [stateKey]: e.target.value })}
           style={styles.input}
+          required={required}
         />
       </div>
     );
@@ -181,19 +182,40 @@ class Signup extends Component {
     e.preventDefault();
     const { txtUsername, txtPassword, txtName, txtPhone, txtEmail, txtAddress } = this.state;
 
-    if (txtUsername && txtPassword && txtName && txtPhone && txtEmail && txtAddress) {
-      const account = {
-        username: txtUsername,
-        password: txtPassword,
-        name: txtName,
-        phone: txtPhone,
-        email: txtEmail,
-        address: txtAddress
-      };
-      this.apiSignup(account);
-    } else {
-      alert('Tuấn ơi, vui lòng nhập đầy đủ tất cả thông tin nhé!');
+    if (!txtUsername || txtUsername.trim() === '') {
+      alert('VUI LÒNG NHẬP TÊN ĐĂNG NHẬP!');
+      return;
     }
+    if (!txtPassword || txtPassword.trim() === '') {
+      alert('VUI LÒNG NHẬP MẬT KHẨU!');
+      return;
+    }
+    if (!txtName || txtName.trim() === '') {
+      alert('VUI LÒNG NHẬP HỌ VÀ TÊN!');
+      return;
+    }
+    if (!txtPhone || txtPhone.trim() === '') {
+      alert('VUI LÒNG NHẬP SỐ ĐIỆN THOẠI!');
+      return;
+    }
+    if (!txtEmail || txtEmail.trim() === '') {
+      alert('VUI LÒNG NHẬP EMAIL!');
+      return;
+    }
+    if (!txtAddress || txtAddress.trim() === '') {
+      alert('VUI LÒNG NHẬP ĐỊA CHỈ!');
+      return;
+    }
+
+    const account = {
+      username: txtUsername,
+      password: txtPassword,
+      name: txtName,
+      phone: txtPhone,
+      email: txtEmail,
+      address: txtAddress
+    };
+    this.apiSignup(account);
   }
 
   apiSignup(account) {

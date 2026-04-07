@@ -132,9 +132,9 @@ class Home extends Component {
             </div>
             <div className="about-right">
               <span className="sub-text">VỀ CHÚNG TÔI</span>
-              <h2 className="about-title">Mukbang Korea Food - Tinh hoa ẩm thực <span className="highlight-orange">Hàn Quốc</span></h2>
+              <h2 className="about-title">Mukbang Store - Tinh hoa ẩm thực <span className="highlight-orange">Hàn Quốc</span></h2>
               <p className="about-p">
-                Mukbang Korea Food tự hào mang đến cho thực khách những trải nghiệm ẩm thực Hàn Quốc đích thực ngay tại Việt Nam.
+                Mukbang Store tự hào mang đến cho thực khách những trải nghiệm ẩm thực Hàn Quốc đích thực ngay tại Việt Nam.
               </p>
               <p className="about-p">
                 Với đội ngũ đầu bếp tâm huyết và nguồn nguyên liệu chất lượng, chúng tôi không ngừng nỗ lực để mang đến những bữa ăn ngon miệng, ấm cúng cho bạn và gia đình.

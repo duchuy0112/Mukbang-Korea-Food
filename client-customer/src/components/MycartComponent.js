@@ -38,6 +38,27 @@ class Mycart extends Component {
   }
 
   lnkCheckoutClick() {
+    const customerContext = this.context.customer || {};
+    const customer = {
+      ...customerContext,
+      name: this.state.txtName !== undefined ? this.state.txtName : (customerContext.name || ''),
+      phone: this.state.txtPhone !== undefined ? this.state.txtPhone : (customerContext.phone || ''),
+      address: this.state.txtAddress !== undefined ? this.state.txtAddress : (customerContext.address || '')
+    };
+
+    if (!customer.address || customer.address.trim() === '') {
+      alert('VUI LÒNG NHẬP ĐỊA CHỈ GIAO HÀNG!');
+      return;
+    }
+    if (!customer.name || customer.name.trim() === '') {
+      alert('VUI LÒNG NHẬP HỌ VÀ TÊN!');
+      return;
+    }
+    if (!customer.phone || customer.phone.trim() === '') {
+      alert('VUI LÒNG NHẬP SỐ ĐIỆN THOẠI!');
+      return;
+    }
+
     if (window.confirm('XÁC NHẬN THANH TOÁN ĐƠN HÀNG NÀY?')) {
       if (this.context.mycart.length > 0) {
         const subtotal = CartUtil.getTotal(this.context.mycart);
@@ -45,14 +66,6 @@ class Mycart extends Component {
         const service = subtotal > 0 ? 15000 : 0;
         const total = subtotal + shipping + service;
         const items = this.context.mycart;
-
-        const customerContext = this.context.customer || {};
-        const customer = {
-          ...customerContext,
-          name: this.state.txtName !== undefined ? this.state.txtName : customerContext.name,
-          phone: this.state.txtPhone !== undefined ? this.state.txtPhone : customerContext.phone,
-          address: this.state.txtAddress !== undefined ? this.state.txtAddress : customerContext.address
-        };
 
         if (this.context.customer) {
           this.apiCheckout(total, items, customer);
@@ -317,35 +330,38 @@ class Mycart extends Component {
                 <h2 className="pay-title">Thông tin thanh toán</h2>
 
                 <div className="form-group">
-                  <label className="form-label">HỌ VÀ TÊN</label>
+                  <label className="form-label">HỌ VÀ TÊN <span style={{color: '#b01e1e'}}>*</span></label>
                   <input 
                     type="text" 
                     className="pay-input" 
                     placeholder="Nhập tên của bạn" 
                     value={this.state.txtName !== undefined ? this.state.txtName : (this.context.customer?.name || '')}
                     onChange={(e) => this.setState({ txtName: e.target.value })}
+                    required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">SỐ ĐIỆN THOẠI</label>
+                  <label className="form-label">SỐ ĐIỆN THOẠI <span style={{color: '#b01e1e'}}>*</span></label>
                   <input 
                     type="text" 
                     className="pay-input" 
                     placeholder="090 123 4567" 
                     value={this.state.txtPhone !== undefined ? this.state.txtPhone : (this.context.customer?.phone || '')}
                     onChange={(e) => this.setState({ txtPhone: e.target.value })}
+                    required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">ĐỊA CHỈ GIAO HÀNG</label>
+                  <label className="form-label">ĐỊA CHỈ GIAO HÀNG <span style={{color: '#b01e1e'}}>*</span></label>
                   <input 
                     type="text" 
                     className="pay-input" 
                     placeholder="Số nhà, tên đường, phường/xã..." 
                     value={this.state.txtAddress !== undefined ? this.state.txtAddress : (this.context.customer?.address || '')}
                     onChange={(e) => this.setState({ txtAddress: e.target.value })}
+                    required
                   />
                 </div>
 

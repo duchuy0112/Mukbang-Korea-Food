@@ -180,42 +180,46 @@ class Myprofile extends Component {
             </div>
 
             <div className="form-group full-width">
-              <label>Họ và tên</label>
+              <label>Họ và tên <span style={{color: '#d32f2f'}}>*</span></label>
               <input
                 className="k-input"
                 type="text"
                 value={this.state.txtName}
                 onChange={(e) => this.setState({ txtName: e.target.value })}
+                required
               />
             </div>
 
             <div className="form-group">
-              <label>Số điện thoại</label>
+              <label>Số điện thoại <span style={{color: '#d32f2f'}}>*</span></label>
               <input
                 className="k-input"
                 type="tel"
                 value={this.state.txtPhone}
                 onChange={(e) => this.setState({ txtPhone: e.target.value })}
+                required
               />
             </div>
 
             <div className="form-group">
-              <label>Email liên hệ</label>
+              <label>Email liên hệ <span style={{color: '#d32f2f'}}>*</span></label>
               <input
                 className="k-input"
                 type="email"
                 value={this.state.txtEmail}
                 onChange={(e) => this.setState({ txtEmail: e.target.value })}
+                required
               />
             </div>
 
             <div className="form-group full-width">
-              <label>Địa chỉ</label>
+              <label>Địa chỉ <span style={{color: '#d32f2f'}}>*</span></label>
               <input
                 className="k-input"
                 type="text"
                 value={this.state.txtAddress}
                 onChange={(e) => this.setState({ txtAddress: e.target.value })}
+                required
               />
             </div>
 
@@ -245,19 +249,32 @@ class Myprofile extends Component {
     e.preventDefault();
     const { txtUsername, txtPassword, txtName, txtPhone, txtEmail, txtAddress } = this.state;
 
-    if (txtUsername && txtPassword && txtName && txtPhone && txtEmail && txtAddress) {
-      const customer = {
-        username: txtUsername,
-        password: txtPassword,
-        name: txtName,
-        phone: txtPhone,
-        email: txtEmail,
-        address: txtAddress,
-      };
-      this.apiPutCustomer(this.context.customer._id, customer);
-    } else {
-      alert("Vui lòng không để trống bất kỳ thông tin nào!");
+    if (!txtName || txtName.trim() === '') {
+      alert('VUI LÒNG NHẬP HỌ VÀ TÊN!');
+      return;
     }
+    if (!txtPhone || txtPhone.trim() === '') {
+      alert('VUI LÒNG NHẬP SỐ ĐIỆN THOẠI!');
+      return;
+    }
+    if (!txtEmail || txtEmail.trim() === '') {
+      alert('VUI LÒNG NHẬP EMAIL!');
+      return;
+    }
+    if (!txtAddress || txtAddress.trim() === '') {
+      alert('VUI LÒNG NHẬP ĐỊA CHỈ!');
+      return;
+    }
+
+    const customer = {
+      username: txtUsername,
+      password: txtPassword,
+      name: txtName,
+      phone: txtPhone,
+      email: txtEmail,
+      address: txtAddress,
+    };
+    this.apiPutCustomer(this.context.customer._id, customer);
   }
 
   apiPutCustomer(id, customer) {
