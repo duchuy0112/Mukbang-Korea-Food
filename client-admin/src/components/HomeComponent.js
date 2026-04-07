@@ -141,7 +141,7 @@ class Home extends Component {
           .card-sales { background: linear-gradient(135deg, #c32d20 0%, #f44336 100%); }
           .card-orders { background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); }
           .card-customers { background: #ffffff; color: #1a1a1a; border: 1px solid #f0f0f0; }
-          .card-customers .stat-inner-label { color: #666; }
+          .card-customers .stat-inner-label { color: #333; } /* Chữ đậm hơn để tăng độ tương phản */
           .card-customers .stat-badge { background: #fdf5f5; border: 1px solid #fee2e2; color: #d32f2f; }
 
           .top-selling-card {
@@ -223,18 +223,22 @@ class Home extends Component {
           .btn-view-all {
             width: 100%;
             padding: 16px;
-            background: #fff;
-            border: 1.5px solid #eee;
+            background: #b3261e; /* Chuyển sang Solid button */
+            border: none;
             border-radius: 18px;
-            color: #b3261e;
+            color: #fff;
             font-weight: 800;
             font-size: 14px;
             cursor: pointer;
             margin-top: 20px;
             transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 8px 25px rgba(179,38,30,0.15);
           }
-          .btn-view-all:hover { background: #b3261e; color: white; border-color: #b3261e; box-shadow: 0 8px 25px rgba(179,38,30,0.25); }
+          .btn-view-all:hover { 
+            background: #991f19; 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 30px rgba(179,38,30,0.3); 
+          }
 
           /* TABLE STYLING */
           .recent-orders-panel {
@@ -280,7 +284,9 @@ class Home extends Component {
           <div className="stat-card card-orders">
             <div className="stat-inner-label">TỔNG ĐƠN HÀNG</div>
             <div className="stat-value">{this.state.totalOrders?.toLocaleString()}</div>
-            <div className="stat-badge">+8.2% <small>hành trình đơn hàng</small></div>
+            <div className="stat-badge">
+              {this.state.totalOrders > 0 ? "+8.2%" : "0%"} <small>tăng trưởng</small>
+            </div>
             <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', opacity: 0.1, fontSize: '80px' }}>🛍️</div>
           </div>
 
@@ -298,12 +304,12 @@ class Home extends Component {
               ) : "🍱"}
             </div>
             <div style={{ lineHeight: 1.2 }}>
-              <div className="stat-inner-label" style={{ color: '#888' }}>BÁN CHẠY NHẤT</div>
-              <div style={{ fontSize: '18px', fontWeight: 900, color: '#1a1a1a', margin: '4px 0' }}>
+            <div className="stat-inner-label" style={{ color: '#333' }}>BÁN CHẠY NHẤT</div>
+            <div style={{ fontSize: '18px', fontWeight: 900, color: '#1a1a1a', margin: '4px 0' }}>
                 {this.state.topSelling?.name || "Kimchi Jjigae"}
               </div>
-              <div style={{ fontSize: '12px', fontWeight: 800, color: '#b3261e' }}>
-                452 đơn <small>tuần này</small>
+              <div style={{ fontSize: '13px', fontWeight: 900, color: '#b3261e', background: '#fff5f5', padding: '4px 10px', borderRadius: '50px', width: 'fit-content' }}>
+                452 đơn <small style={{ fontWeight: 700 }}>tuần này</small>
               </div>
             </div>
           </div>
@@ -340,19 +346,21 @@ class Home extends Component {
                   <line key={i} x1="0" y1={200 - 180 * f} x2="600" y2={200 - 180 * f} stroke="#f0f0f0" strokeWidth="1" strokeDasharray="5,5" />
                 ))}
 
-                {/* Wave Path */}
+                {/* Wave Path for Online (Red) */}
                 <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50 L 600 200 L 0 200 Z" fill="url(#homeWaveGrad)" />
+                <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50" fill="none" stroke="#c32d20" strokeWidth="4" strokeLinecap="round" filter="url(#softShadow)" />
 
-                <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50" fill="none" stroke="#c32d20" strokeWidth="5" strokeLinecap="round" filter="url(#softShadow)" />
+                {/* Second Path for Takeaway (Brown) */}
+                <path d="M 0 180 C 100 180, 200 150, 300 160 C 400 170, 500 110, 600 130" fill="none" stroke="#8b4513" strokeWidth="4" strokeDasharray="8,5" opacity="0.6" strokeLinecap="round" />
 
-                {/* Animated Dots */}
-                <circle cx="200" cy="80" r="6" fill="#fff" stroke="#c32d20" strokeWidth="3" />
-                <circle cx="400" cy="120" r="6" fill="#fff" stroke="#c32d20" strokeWidth="3" />
-                <circle cx="600" cy="50" r="6" fill="#fff" stroke="#c32d20" strokeWidth="3" />
+                {/* Animated Dots for primary path */}
+                <circle cx="200" cy="80" r="5" fill="#fff" stroke="#c32d20" strokeWidth="2.5" />
+                <circle cx="400" cy="120" r="5" fill="#fff" stroke="#c32d20" strokeWidth="2.5" />
+                <circle cx="600" cy="50" r="5" fill="#fff" stroke="#c32d20" strokeWidth="2.5" />
 
                 {/* Month Labels */}
                 {['T1', 'T2', 'T3', 'T4', 'T5', 'T6'].map((m, i) => (
-                  <text key={i} x={i * 120} y="215" textAnchor="middle" fill="#ccc" fontSize="12" fontWeight="800">{m}</text>
+                  <text key={i} x={i * 120} y="215" textAnchor="middle" fill="#999" fontSize="12" fontWeight="800">{m}</text>
                 ))}
               </svg>
             </div>

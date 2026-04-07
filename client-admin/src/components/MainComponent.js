@@ -47,14 +47,15 @@ class Main extends Component {
               display: flex;
               align-items: center;
               width: 450px;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-              border: 1px solid #f0f0f0;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* Tăng đổ bóng */
+              border: 1.5px solid #eee; /* Đường viền rõ ràng hơn */
               transition: all 0.3s ease;
             }
             .admin-search-box:focus-within {
               border-color: #d32f2f;
-              box-shadow: 0 10px 30px rgba(211,47,47,0.08);
+              box-shadow: 0 10px 30px rgba(211,47,47,0.12);
               width: 480px;
+              background: #fff;
             }
             .admin-search-box input {
               border: none;

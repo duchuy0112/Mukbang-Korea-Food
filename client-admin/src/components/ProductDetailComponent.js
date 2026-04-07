@@ -14,6 +14,7 @@ class ProductDetail extends Component {
       txtPrice: 0,
       cmbCategory: '',
       txtDescription: '',
+      txtIngredients: '',
       imgProduct: '',
     };
   }
@@ -31,6 +32,7 @@ class ProductDetail extends Component {
         txtPrice: this.props.item.price,
         cmbCategory: this.props.item.category._id,
         txtDescription: this.props.item.description || '',
+        txtIngredients: this.props.item.ingredients || '',
         imgProduct: 'data:image/jpg;base64,' + this.props.item.image,
       });
     }
@@ -54,10 +56,11 @@ class ProductDetail extends Component {
     const price = parseInt(this.state.txtPrice);
     const category = this.state.cmbCategory;
     const description = this.state.txtDescription;
+    const ingredients = this.state.txtIngredients;
     const image = this.state.imgProduct.replace(/^data:image\/[a-z]+;base64,/, '');
 
     if (name && price && category && image) {
-      const prod = { name, price, category, description, image };
+      const prod = { name, price, category, description, ingredients, image };
       this.apiPostProduct(prod);
     } else {
       alert('Vui lòng nhập đầy đủ thông tin sản phẩm!');
@@ -71,10 +74,11 @@ class ProductDetail extends Component {
     const price = parseInt(this.state.txtPrice);
     const category = this.state.cmbCategory;
     const description = this.state.txtDescription;
+    const ingredients = this.state.txtIngredients;
     const image = this.state.imgProduct.replace(/^data:image\/[a-z]+;base64,/, '');
 
     if (id && name && price && category && image) {
-      const prod = { name, price, category, description, image };
+      const prod = { name, price, category, description, ingredients, image };
       this.apiPutProduct(id, prod);
     } else {
       alert('Vui lòng chọn sản phẩm cần cập nhật!');
@@ -326,6 +330,18 @@ class ProductDetail extends Component {
                     value={this.state.txtDescription} 
                     onChange={(e) => this.setState({ txtDescription: e.target.value })} 
                     placeholder="Nhập mô tả món ăn..."
+                  ></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td className="label-text">Thành Phần</td>
+                <td>
+                  <textarea 
+                    className="input-custom" 
+                    rows="3" 
+                    value={this.state.txtIngredients} 
+                    onChange={(e) => this.setState({ txtIngredients: e.target.value })} 
+                    placeholder="Nhập thành phần chi tiết..."
                   ></textarea>
                 </td>
               </tr>
