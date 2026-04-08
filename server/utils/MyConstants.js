@@ -1,18 +1,14 @@
-require('dotenv').config();
-
 const MyConstants = {
-  DB_SERVER:   process.env.DB_SERVER,
-  DB_USER:     process.env.DB_USER,
-  DB_PASS:     process.env.DB_PASS,
-  DB_DATABASE: process.env.DB_DATABASE,
+  DB_SERVER: 'koreanfood.jzt2jhx.mongodb.net',
+  DB_USER: 'huy',
+  DB_PASS: '123',
+  DB_DATABASE: 'koreafood',
 
-  EMAIL_USER: process.env.EMAIL_USER,
-  EMAIL_PASS: process.env.EMAIL_PASS,
+  EMAIL_USER: 'duchuy011205@gmail.com',
+  EMAIL_PASS: 'anfelhtddxbvguuj',
 
-  JWT_SECRET:  process.env.JWT_SECRET,
-  JWT_EXPIRES: process.env.JWT_EXPIRES || '24h',
-
-  BCRYPT_SALT_ROUNDS: parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 12
+  JWT_SECRET: 'abdef',
+  JWT_EXPIRES: '3287246589523977687'
 };
 
 module.exports = MyConstants;

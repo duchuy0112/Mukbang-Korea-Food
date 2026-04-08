@@ -1,8 +1,6 @@
 // ================== IMPORT ==================
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const MyConstants = require('../utils/MyConstants');
 
 // ================== UTILS ==================
 const JwtUtil = require('../utils/JwtUtil');
@@ -20,37 +18,26 @@ router.post('/login', async function (req, res) {
   const password = req.body.password;
 
   if (username && password) {
-    const admin = await AdminDAO.selectByUsername(username);
+    const admin = await AdminDAO.selectByUsernameAndPassword(username, password);
 
     if (admin) {
-      let passwordMatch = false;
-      if (admin.password && admin.password.startsWith('$2')) {
-        // bcrypt hash
-        passwordMatch = await bcrypt.compare(password, admin.password);
-      } else {
-        // Legacy plaintext — auto-upgrade on next login
-        passwordMatch = (admin.password === password);
-        if (passwordMatch) {
-          const newHash = await bcrypt.hash(password, MyConstants.BCRYPT_SALT_ROUNDS);
-          await AdminDAO.updatePassword(username, newHash);
-        }
-      }
-
-      if (passwordMatch) {
-        const token = JwtUtil.genToken(username, admin._id);
-        res.json({
-          success: true,
-          message: 'Authentication successful',
-          token: token
-        });
-      } else {
-        res.json({ success: false, message: 'Incorrect username or password' });
-      }
+      const token = JwtUtil.genToken(username, password);
+      res.json({
+        success: true,
+        message: 'Authentication successful',
+        token: token
+      });
     } else {
-      res.json({ success: false, message: 'Incorrect username or password' });
+      res.json({
+        success: false,
+        message: 'Incorrect username or password'
+      });
     }
   } else {
-    res.json({ success: false, message: 'Please input username and password' });
+    res.json({
+      success: false,
+      message: 'Please input username and password'
+    });
   }
 });
 
@@ -146,19 +133,6 @@ router.put('/products/:id', JwtUtil.checkToken, async function (req, res) {
   res.json(result);
 });
 
-// ================== TOKEN ==================
-router.get('/token', JwtUtil.checkToken, function (req, res) {
-  const token =
-    req.headers['x-access-token'] || req.headers['authorization'];
-
-  res.json({
-    success: true,
-    message: 'Token is valid',
-    token: token
-  });
-});
-
-// product
 router.delete('/products/:id', JwtUtil.checkToken, async function (req, res) {
   const _id = req.params.id;
   const result = await ProductDAO.delete(_id);
