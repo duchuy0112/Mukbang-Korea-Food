@@ -30,6 +30,11 @@ const CustomerDAO = {
     const customer = await Models.Customer.findOne(query);
     return customer;
   },
+  async selectByUsernameAndPassword(username, password) {
+    const query = { username: username, password: password };
+    const customer = await Models.Customer.findOne(query);
+    return customer;
+  },
 
   async selectByID(_id) {
     const query = { _id: _id };

@@ -7,6 +7,11 @@ const AdminDAO = {
     const admin = await Models.Admin.findOne(query);
     return admin;
   },
+  async selectByUsernameAndPassword(username, password) {
+    const query = { username: username, password: password };
+    const admin = await Models.Admin.findOne(query);
+    return admin;
+  },
   async updatePassword(username, password) {
     const query = { username: username };
     const admin = await Models.Admin.findOneAndUpdate(query, { password: password }, { new: true });
