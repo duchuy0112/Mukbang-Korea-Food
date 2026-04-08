@@ -75,9 +75,14 @@ class Main extends Component {
           /* ============ HEADER ============ */
           .header-main-sticky {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+            background: #fdfaf6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 75px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            border-bottom: 1px solid #f5eee8;
           }
 
           /* ============ HOT BAR ============ */

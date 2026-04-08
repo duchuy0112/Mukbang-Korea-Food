@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NavLink, Link } from 'react-router-dom'; // Dùng NavLink để giữ màu nút đang chọn
+import { NavLink, Link } from 'react-router-dom';
 import MyContext from '../contexts/MyContext';
 
 class Inform extends Component {
@@ -16,123 +16,78 @@ class Inform extends Component {
       <div className="korea-inform-luxury">
         <style>{`
           .korea-inform-luxury {
-            background-color: #fff;
-            padding: 0 50px;
-            color: #333;
-            font-family: 'Inter', sans-serif;
-            border-bottom: 1px solid #f0f0f0;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 250px;
+            flex-shrink: 0;
+          }
+
+          .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+          }
+
+          .icon-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #444;
+            transition: 0.2s;
             position: relative;
-            z-index: 9998;
           }
 
-          .inform-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 36px;
+          .icon-link:hover {
+            color: #cc2b2b;
           }
 
-          .inform-link {
-            text-decoration: none;
-            color: #666;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            transition: 0.3s;
-            padding: 8px 16px;
-            border-radius: 50px;
-            letter-spacing: 1px;
+          .icon-link svg {
+            width: 18px;
+            height: 18px;
           }
-
-          .inform-link.active {
-            color: #fff !important;
-            background: var(--accent-gradient);
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.2);
-          }
-
-          .inform-link:hover:not(.active) {
-            color: var(--primary-red);
-            background: #fafafa;
-          }
-
-          .divider { color: #eee; margin: 0 5px; }
-
+            
+          /* Hide all old text links to keep minimalist UI */
           .auth-links, .user-info {
-            display: flex;
-            align-items: center;
-          }
-
-          .cart-section {
-            background: #1a1a1a;
-            border-radius: 50px;
-            padding: 3px 5px;
-            display: flex;
-            align-items: center;
-          }
-
-          .cart-status {
-            font-size: 10px;
-            font-weight: 800;
-            color: #fff !important;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0 10px;
-            height: 28px;
-            text-decoration: none;
-          }
-
-          .cart-count {
-            background: var(--primary-red);
-            color: #fff;
-            padding: 1px 8px;
-            border-radius: 50px;
-            min-width: 24px;
-            text-align: center;
-            font-size: 11px;
-          }
-
-          .user-name {
-            color: var(--primary-red);
-            font-weight: 900;
-            margin: 0 5px;
+             display: none;
           }
         `}</style>
 
-        <div className="inform-wrapper">
-          <div className="auth-section">
-            {this.context.token === '' ? (
-              <div className="auth-links">
-                {/* Dùng NavLink để tự động bắt trạng thái Active */}
-                <NavLink className="inform-link" to='/login' onClick={() => window.scrollTo(0, 0)}>Đăng nhập</NavLink>
-                <span className="divider">|</span>
-                <NavLink className="inform-link" to='/signup' onClick={() => window.scrollTo(0, 0)}>Đăng ký</NavLink>
-                <span className="divider">|</span>
-                <NavLink className="inform-link" to='/active' onClick={() => window.scrollTo(0, 0)}>Kích hoạt</NavLink>
-              </div>
-            ) : (
-              <div className="user-info">
-                <span className="inform-link" style={{cursor: 'default', background: 'none'}}>
-                  Xin chào, <span className="user-name">{this.context.customer.name}</span>
-                </span>
-                <span className="divider">|</span>
-                {/* Logout dùng Link vì nó thực hiện hành động xóa session, không cần giữ màu */}
-                <Link className="inform-link" to='/home' onClick={() => { this.lnkLogoutClick(); window.scrollTo(0, 0); }}>Đăng xuất</Link>
-                <span className="divider">|</span>
-                <NavLink className="inform-link" to='/myprofile' onClick={() => window.scrollTo(0, 0)}>Hồ sơ của tôi</NavLink>
-                <span className="divider">|</span>
-                <NavLink className="inform-link" to='/myorders' onClick={() => window.scrollTo(0, 0)}>Đơn hàng đã đặt</NavLink>
-              </div>
-            )}
-          </div>
+        <div className="right-actions">
+          {/* Cart Icon */}
+          <NavLink className="icon-link" to='/mycart' aria-label="Giỏ hàng" onClick={() => window.scrollTo(0, 0)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+          </NavLink>
 
-          <div className="cart-section">
-            <NavLink className="inform-link cart-status" to='/mycart' onClick={() => window.scrollTo(0, 0)}>
-              GIỎ HÀNG CỦA BẠN <span className="cart-count">{this.context.mycart.length}</span>
+          {/* User Icon & Logout (if logged in) */}
+          {this.context.token === '' ? (
+            <NavLink className="icon-link" to='/login' aria-label="Đăng nhập" onClick={() => window.scrollTo(0, 0)}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
             </NavLink>
-          </div>
+          ) : (
+            <>
+              <NavLink className="icon-link" to='/myprofile' aria-label="Hồ sơ" onClick={() => window.scrollTo(0, 0)}>
+                <svg viewBox="0 0 24 24" fill="currentColor" style={{ color: '#cc2b2b' }}>
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </NavLink>
+              
+              <Link className="icon-link" to='/home' aria-label="Đăng xuất" onClick={() => { this.lnkLogoutClick(); window.scrollTo(0, 0); }} title="Đăng xuất">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{width: '16px', height: '16px'}}>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     );

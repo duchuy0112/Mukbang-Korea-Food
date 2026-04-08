@@ -24,207 +24,270 @@ class Myprofile extends Component {
     }
 
     return (
-      <div className="korea-profile-container">
+      <div className="auth-page">
         <style>{`
-          .korea-profile-container {
-            padding: 60px 20px;
-            min-height: 80vh;
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&display=swap');
+
+          .auth-page {
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
             font-family: 'Inter', sans-serif;
+            background: #f5f0ed;
           }
 
-          .profile-card {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(211, 47, 47, 0.1);
-            border: 2px solid #ff9f43;
-            width: 100%;
-            max-width: 550px;
+          .auth-visual {
+            flex: 1;
             position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
           }
 
-          .profile-card::before {
+          .auth-visual img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .auth-visual::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 8px;
-            background: linear-gradient(90deg, #d32f2f, #ff9f43, #d32f2f);
-            border-radius: 30px 30px 0 0;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
           }
 
-          .profile-title {
-            color: #d32f2f;
-            text-align: center;
-            font-weight: 900;
-            font-size: 28px;
-            margin-bottom: 30px;
+          .visual-content {
+            position: relative;
+            z-index: 2;
+            padding: 60px;
+            color: #fff;
+          }
+
+          .visual-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.8);
           }
 
-          .profile-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+          .visual-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 54px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0 0 20px;
+          }
+
+          .visual-desc {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.9);
+            max-width: 400px;
+          }
+
+          .auth-form-panel {
+            width: 580px;
+            background: #fff;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow-y: auto;
+          }
+
+          .auth-form-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #1a1a1a;
+            letter-spacing: -1px;
+            margin: 0 0 10px;
+          }
+
+          .auth-form-sub {
+            font-size: 15px;
+            color: #666;
+            margin: 0 0 40px;
+            line-height: 1.5;
+          }
+
+          .auth-row {
+            display: flex;
             gap: 20px;
           }
 
-          .full-width { grid-column: span 2; }
-
-          .form-group { margin-bottom: 5px; }
-
-          .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 700;
-            color: #555;
-            font-size: 13px;
-            text-transform: uppercase;
+          .auth-row > div {
+            flex: 1;
           }
 
-          .k-input {
+          .auth-field {
+            margin-bottom: 24px;
+          }
+
+          .auth-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+          }
+
+          .auth-input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #eee;
+            height: 52px;
+            padding: 0 16px;
+            border: 1.5px solid #e5e5e5;
             border-radius: 12px;
             font-size: 15px;
-            font-weight: 600;
-            transition: 0.3s;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #1a1a1a;
             outline: none;
+            transition: all 0.2s ease;
             box-sizing: border-box;
+            background: #fafafa;
           }
 
-          .k-input:focus {
-            border-color: #ff9f43;
-            box-shadow: 0 0 15px rgba(255, 159, 67, 0.15);
-            background: #fffcf9;
+          .auth-input:focus {
+            border-color: #c62828;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(198, 40, 40, 0.1);
           }
 
-          .k-input:disabled {
-            background: #f9f9f9;
+          .auth-input:disabled {
+            background: #f5f5f5;
             color: #999;
             cursor: not-allowed;
           }
 
-          .btn-update {
-            grid-column: span 2;
-            padding: 16px;
-            margin-top: 20px;
-            background: linear-gradient(135deg, #d32f2f 0%, #ff8c00 100%);
-            color: white;
+          .auth-submit {
+            width: 100%;
+            height: 56px;
+            background: #c62828;
+            color: #fff;
             border: none;
-            border-radius: 50px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 900;
+            font-weight: 700;
+            margin-top: 10px;
             cursor: pointer;
-            transition: 0.4s;
-            text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(211, 47, 47, 0.2);
-          }
-
-          .btn-update:hover {
-            transform: translateY(-3px);
-            filter: brightness(1.1);
-            box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3);
-          }
-
-          .profile-badge {
-            text-align: center;
-            margin-bottom: 25px;
-          }
-
-          .user-icon {
-            background: #fff5f5;
-            color: #d32f2f;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: inline-flex;
+            transition: all 0.3s ease;
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 35px;
-            border: 2px solid #ff9f43;
-            font-weight: bold;
+            gap: 10px;
+          }
+
+          .auth-submit:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(198, 40, 40, 0.25);
+          }
+
+          @media (max-width: 900px) {
+            .auth-page { flex-direction: column; }
+            .auth-visual { min-height: 260px; }
+            .auth-form-panel { width: 100%; padding: 30px 24px; }
+            .auth-row { flex-direction: column; gap: 0; }
           }
         `}</style>
 
-        <div className="profile-card">
-          <div className="profile-badge">
-            <div className="user-icon">{this.state.txtName ? this.state.txtName.charAt(0).toUpperCase() : 'U'}</div>
+        {/* LEFT: IMAGE */}
+        <div className="auth-visual">
+          <img src="/images/login_new.jpg" alt="Mukbang Korea Food Profile" />
+          <div className="visual-content">
+            <div className="visual-label">TÀI KHOẢN CÁ NHÂN</div>
+            <h2 className="visual-title">Xin chào,<br/>{this.state.txtName || 'Hội viên'}</h2>
+            <p className="visual-desc">
+              Quản lý thông tin giao hàng và bảo mật tài khoản của bạn tại Mukbang Korea Food để có trải nghiệm tốt nhất.
+            </p>
           </div>
-          
-          <h2 className="profile-title">Thông Tin Cá Nhân</h2>
+        </div>
 
-          <form className="profile-form" onSubmit={(e) => this.btnUpdateClick(e)}>
-            <div className="form-group">
-              <label>Tên đăng nhập</label>
-              <input
-                className="k-input"
-                type="text"
-                value={this.state.txtUsername}
-                disabled
-              />
+        {/* RIGHT: FORM */}
+        <div className="auth-form-panel">
+          <h1 className="auth-form-title">Hồ sơ của tôi</h1>
+          <p className="auth-form-sub">Cập nhật thông tin giao hàng & liên hệ.</p>
+
+          <form onSubmit={(e) => this.btnUpdateClick(e)}>
+            <div className="auth-row">
+              <div className="auth-field">
+                <label className="auth-label">Tên đăng nhập</label>
+                <input
+                  type="text"
+                  className="auth-input"
+                  value={this.state.txtUsername}
+                  disabled
+                />
+              </div>
+              <div className="auth-field">
+                <label className="auth-label">Mật khẩu mới</label>
+                <input
+                  type="password"
+                  className="auth-input"
+                  placeholder="Để trống nếu không đổi..."
+                  value={this.state.txtPassword}
+                  onChange={(e) => this.setState({ txtPassword: e.target.value })}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Mật khẩu mới</label>
+            <div className="auth-field">
+              <label className="auth-label">Họ và tên *</label>
               <input
-                className="k-input"
-                type="password"
-                placeholder="Nhập mật khẩu mới..."
-                value={this.state.txtPassword}
-                onChange={(e) => this.setState({ txtPassword: e.target.value })}
-              />
-            </div>
-
-            <div className="form-group full-width">
-              <label>Họ và tên <span style={{color: '#d32f2f'}}>*</span></label>
-              <input
-                className="k-input"
                 type="text"
+                className="auth-input"
+                placeholder="Nhập họ và tên đầy đủ..."
                 value={this.state.txtName}
                 onChange={(e) => this.setState({ txtName: e.target.value })}
                 required
               />
             </div>
 
-            <div className="form-group">
-              <label>Số điện thoại <span style={{color: '#d32f2f'}}>*</span></label>
-              <input
-                className="k-input"
-                type="tel"
-                value={this.state.txtPhone}
-                onChange={(e) => this.setState({ txtPhone: e.target.value })}
-                required
-              />
+            <div className="auth-row">
+              <div className="auth-field">
+                <label className="auth-label">Số điện thoại *</label>
+                <input
+                  type="tel"
+                  className="auth-input"
+                  placeholder="090..."
+                  value={this.state.txtPhone}
+                  onChange={(e) => this.setState({ txtPhone: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="auth-field">
+                <label className="auth-label">Email liên hệ *</label>
+                <input
+                  type="email"
+                  className="auth-input"
+                  placeholder="name@example.com"
+                  value={this.state.txtEmail}
+                  onChange={(e) => this.setState({ txtEmail: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Email liên hệ <span style={{color: '#d32f2f'}}>*</span></label>
+            <div className="auth-field">
+              <label className="auth-label">Địa chỉ giao hàng mặc định *</label>
               <input
-                className="k-input"
-                type="email"
-                value={this.state.txtEmail}
-                onChange={(e) => this.setState({ txtEmail: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="form-group full-width">
-              <label>Địa chỉ <span style={{color: '#d32f2f'}}>*</span></label>
-              <input
-                className="k-input"
                 type="text"
+                className="auth-input"
+                placeholder="Số nhà, đường, quận/huyện..."
                 value={this.state.txtAddress}
                 onChange={(e) => this.setState({ txtAddress: e.target.value })}
                 required
               />
             </div>
 
-            <button type="submit" className="btn-update">
-              Cập Nhật Hồ Sơ 
+            <button type="submit" className="auth-submit">
+              Cập nhật hồ sơ <span>→</span>
             </button>
           </form>
         </div>

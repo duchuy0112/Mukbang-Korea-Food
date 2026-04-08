@@ -84,7 +84,7 @@ class Mycart extends Component {
 
     axios.post('/api/customer/checkout', body, config).then((res) => {
       if (res.data) {
-        alert('CHÚC MỪNG! ĐẶT HÀNG THÀNH CÔNG 🎉\n' + (this.state.payMethod !== 'COD' ? 'Vui lòng đảm bảo bạn đã thực hiện chuyển khoản.' : 'Vui lòng chuẩn bị tiền mặt khi nhận hàng.'));
+        alert('CHÚC MỪNG! ĐẶT HÀNG THÀNH CÔNG 🎉\n' + (this.state.payMethod !== 'COD' ? '' : 'Vui lòng chuẩn bị tiền mặt khi nhận hàng.'));
         this.context.setMycart([]);
         this.props.navigate('/home');
       } else {
@@ -290,8 +290,8 @@ class Mycart extends Component {
                     <div className="item-info">
                       <h4 className="item-name">{item.product.name}</h4>
                       <p className="item-sub">
-                        {item.product.description ? 
-                          (item.product.description.length > 60 ? item.product.description.substring(0, 57) + '...' : item.product.description) 
+                        {item.product.description ?
+                          (item.product.description.length > 60 ? item.product.description.substring(0, 57) + '...' : item.product.description)
                           : "Hương vị Hàn độc bản."}
                       </p>
                       <div className="qty-pill">
@@ -302,14 +302,14 @@ class Mycart extends Component {
                     </div>
                     <div className="item-price-col">
                       <div className="item-price">{(item.product.price * item.quantity).toLocaleString()}đ</div>
-                      <button 
-                        style={{background:'none', border:'none', color:'#ccc', fontSize:'11px', marginTop:'10px', cursor:'pointer'}}
+                      <button
+                        style={{ background: 'none', border: 'none', color: '#ccc', fontSize: '11px', marginTop: '10px', cursor: 'pointer' }}
                         onClick={() => this.lnkRemoveClick(item.product._id)}
                       >Xóa món</button>
                     </div>
                   </div>
                 )) : (
-                  <div style={{textAlign:'center', padding:'50px', background:'#fff', borderRadius:'16px', color:'#999'}}>
+                  <div style={{ textAlign: 'center', padding: '50px', background: '#fff', borderRadius: '16px', color: '#999' }}>
                     Giỏ hàng của bạn đang trống. Hãy chọn món nhé!
                   </div>
                 )}
@@ -330,11 +330,11 @@ class Mycart extends Component {
                 <h2 className="pay-title">Thông tin thanh toán</h2>
 
                 <div className="form-group">
-                  <label className="form-label">HỌ VÀ TÊN <span style={{color: '#b01e1e'}}>*</span></label>
-                  <input 
-                    type="text" 
-                    className="pay-input" 
-                    placeholder="Nhập tên của bạn" 
+                  <label className="form-label">HỌ VÀ TÊN <span style={{ color: '#b01e1e' }}>*</span></label>
+                  <input
+                    type="text"
+                    className="pay-input"
+                    placeholder="Nhập tên của bạn"
                     value={this.state.txtName !== undefined ? this.state.txtName : (this.context.customer?.name || '')}
                     onChange={(e) => this.setState({ txtName: e.target.value })}
                     required
@@ -342,11 +342,11 @@ class Mycart extends Component {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">SỐ ĐIỆN THOẠI <span style={{color: '#b01e1e'}}>*</span></label>
-                  <input 
-                    type="text" 
-                    className="pay-input" 
-                    placeholder="090 123 4567" 
+                  <label className="form-label">SỐ ĐIỆN THOẠI <span style={{ color: '#b01e1e' }}>*</span></label>
+                  <input
+                    type="text"
+                    className="pay-input"
+                    placeholder="090 123 4567"
                     value={this.state.txtPhone !== undefined ? this.state.txtPhone : (this.context.customer?.phone || '')}
                     onChange={(e) => this.setState({ txtPhone: e.target.value })}
                     required
@@ -354,11 +354,11 @@ class Mycart extends Component {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">ĐỊA CHỈ GIAO HÀNG <span style={{color: '#b01e1e'}}>*</span></label>
-                  <input 
-                    type="text" 
-                    className="pay-input" 
-                    placeholder="Số nhà, tên đường, phường/xã..." 
+                  <label className="form-label">ĐỊA CHỈ GIAO HÀNG <span style={{ color: '#b01e1e' }}>*</span></label>
+                  <input
+                    type="text"
+                    className="pay-input"
+                    placeholder="Số nhà, tên đường, phường/xã..."
                     value={this.state.txtAddress !== undefined ? this.state.txtAddress : (this.context.customer?.address || '')}
                     onChange={(e) => this.setState({ txtAddress: e.target.value })}
                     required
@@ -395,10 +395,10 @@ class Mycart extends Component {
                   <div className="qr-section">
                     <span className="qr-title">Hệ thống VietQR</span>
                     <p className="qr-desc">Vui lòng quét mã bên dưới để thanh toán đơn hàng</p>
-                    <img 
-                      src={`https://img.vietqr.io/image/MB-1230111999999-compact.png?amount=${totalPayable}&addInfo=KH%20${this.context.customer?.name}%20THANH%20TOAN%20MUKBANG&accountName=MUKBANG%20KOREA%20FOOD`} 
-                      alt="VietQR Bank" 
-                      className="qr-img" 
+                    <img
+                      src={`https://img.vietqr.io/image/MB-1230111999999-compact.png?amount=${totalPayable}&addInfo=KH%20${this.context.customer?.name}%20THANH%20TOAN%20MUKBANG&accountName=MUKBANG%20KOREA%20FOOD`}
+                      alt="VietQR Bank"
+                      className="qr-img"
                     />
                     <div className="qr-bank-info">
                       <div>Ngân hàng: <b>MB Bank (Quân Đội)</b></div>
@@ -413,12 +413,12 @@ class Mycart extends Component {
                     <span className="qr-title">Thanh toán MoMo</span>
                     <p className="qr-desc">Quét mã để thanh toán qua ứng dụng Ví MoMo</p>
                     {/* Placeholder MoMo QR - trong thực tế sẽ là QR động từ Gateway */}
-                    <img 
-                      src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=2|99|0901234567|MUKBANG%20KOREA|contact@mukbang.vn|0|0|50000" 
-                      alt="MoMo QR" 
-                      className="qr-img" 
+                    <img
+                      src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=2|99|0901234567|MUKBANG%20KOREA|contact@mukbang.vn|0|0|50000"
+                      alt="MoMo QR"
+                      className="qr-img"
                     />
-                    <div className="qr-bank-info" style={{textAlign:'center'}}>
+                    <div className="qr-bank-info" style={{ textAlign: 'center' }}>
                       <div>Số điện thoại: <b>0901 234 567</b></div>
                       <div>Người nhận: <b>MUKBANG KOREA FOOD</b></div>
                     </div>
@@ -434,7 +434,7 @@ class Mycart extends Component {
                     <span>Phí vận chuyển</span>
                     <span>{shipping.toLocaleString()}đ</span>
                   </div>
-                  
+
                   <div className="total-row">
                     <span className="total-lbl">Tổng cộng</span>
                     <span className="total-val">{totalPayable.toLocaleString()}đ</span>
