@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "body-parser": "^1.20.2",
     "crypto": "^1.0.1",
@@ -9,7 +12,7 @@
     "nodemailer": "^6.9.5"
   },
   "scripts": {
-    "build": "(npm install) && (cd ../client-admin && npm install && npm run build) && (cd ../client-customer && npm install && npm run build)",
+    "build": "npm install && cd ../client-admin && npm install && npm run build && cd ../client-customer && npm install && npm run build",
     "start": "node index.js"
   }
 }
