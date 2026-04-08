@@ -2,9 +2,10 @@ const jwt = require('jsonwebtoken');
 const MyConstants = require('./MyConstants');
 
 const JwtUtil = {
-  genToken(username, password) {
+  genToken(username, userId) {
+    // DO NOT put passwords in the JWT payload!
     const token = jwt.sign(
-      { username: username, password: password },
+      { username: username, userId: userId },
       MyConstants.JWT_SECRET,
       { expiresIn: MyConstants.JWT_EXPIRES }
     );

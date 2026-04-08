@@ -1,6 +1,8 @@
 // ================== IMPORT ==================
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const MyConstants = require('../utils/MyConstants');
 
 // ================== UTILS ==================
 const JwtUtil = require('../utils/JwtUtil');
@@ -18,26 +20,37 @@ router.post('/login', async function (req, res) {
   const password = req.body.password;
 
   if (username && password) {
-    const admin = await AdminDAO.selectByUsernameAndPassword(username, password);
+    const admin = await AdminDAO.selectByUsername(username);
 
     if (admin) {
-      const token = JwtUtil.genToken(username, password);
-      res.json({
-        success: true,
-        message: 'Authentication successful',
-        token: token
-      });
+      let passwordMatch = false;
+      if (admin.password && admin.password.startsWith('$2')) {
+        // bcrypt hash
+        passwordMatch = await bcrypt.compare(password, admin.password);
+      } else {
+        // Legacy plaintext — auto-upgrade on next login
+        passwordMatch = (admin.password === password);
+        if (passwordMatch) {
+          const newHash = await bcrypt.hash(password, MyConstants.BCRYPT_SALT_ROUNDS);
+          await AdminDAO.updatePassword(username, newHash);
+        }
+      }
+
+      if (passwordMatch) {
+        const token = JwtUtil.genToken(username, admin._id);
+        res.json({
+          success: true,
+          message: 'Authentication successful',
+          token: token
+        });
+      } else {
+        res.json({ success: false, message: 'Incorrect username or password' });
+      }
     } else {
-      res.json({
-        success: false,
-        message: 'Incorrect username or password'
-      });
+      res.json({ success: false, message: 'Incorrect username or password' });
     }
   } else {
-    res.json({
-      success: false,
-      message: 'Please input username and password'
-    });
+    res.json({ success: false, message: 'Please input username and password' });
   }
 });
 
@@ -157,6 +170,22 @@ router.get('/orders', JwtUtil.checkToken, async function (req, res) {
   const orders = await OrderDAO.selectAll();
   res.json(orders);
 });
+router.post('/orders', JwtUtil.checkToken, async function (req, res) {
+  const order = {
+    cdate: new Date().getTime(),
+    total: req.body.total || 0,
+    status: req.body.status || 'APPROVED',
+    customer: req.body.customer,
+    items: req.body.items || []
+  };
+  const result = await OrderDAO.insert(order);
+  res.json(result);
+});
+router.get('/all-products', JwtUtil.checkToken, async function (req, res) {
+  // Use ProductDAO to get all products for the manual order dropdown
+  const products = await ProductDAO.selectAll();
+  res.json(products);
+});
 router.put('/orders/status/:id', JwtUtil.checkToken, async function (req, res) {
   const _id = req.params.id;
   const newStatus = req.body.status;
@@ -174,10 +203,9 @@ router.get('/customers', JwtUtil.checkToken, async function (req, res) {
     const customers = await CustomerDAO.selectAll();
     res.json(customers);
 });
-router.put('/customers/deactive/:id', JwtUtil.checkToken, async function (req, res) {
+router.delete('/customers/:id', JwtUtil.checkToken, async function (req, res) {
     const _id = req.params.id;
-    const token = req.body.token;
-    const result = await CustomerDAO.active(_id, token, 0);
+    const result = await CustomerDAO.delete(_id);
     res.json(result);
 });
 // customer
