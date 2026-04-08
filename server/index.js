@@ -5,6 +5,14 @@ const path = require('path');
 const express = require('express');
 const app = express();
 
+// Bắt lỗi toàn cục để tránh server bị crash trên Render
+process.on('uncaughtException', (err) => {
+  console.error("Uncaught Exception:", err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
 // 1. Kết nối MongoDB
 require('./utils/MongooseUtil');
 
@@ -21,17 +29,27 @@ app.get('/hello', (req, res) => {
 app.use('/api/admin', require('./api/admin.js'));
 app.use('/api/customer', require('./api/customer.js'));
 
+// Thêm health check cho Render proxy kiểm tra trạng thái server
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // 4. Deployment (Phục vụ file static từ thư mục Build của React)
 // Phải đặt sau các API để không bị ghi đè link
 app.use('/admin', express.static(path.resolve(__dirname, '../client-admin/build')));
 app.get('/admin/*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client-admin/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../client-admin/build', 'index.html'), err => {
+    if (err) res.status(500).send("Lỗi tải trang Admin. Vui lòng kiểm tra lại quá trình build trên Render.");
+  });
 });
 
 app.use('/', express.static(path.resolve(__dirname, '../client-customer/build')));
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client-customer/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../client-customer/build', 'index.html'), err => {
+    if (err) res.status(500).send("Lỗi tải trang Customer. Vui lòng kiểm tra lại quá trình build trên Render.");
+  });
 });
+
 
 // 5. Khởi chạy Server
 const PORT = process.env.PORT || 4000;

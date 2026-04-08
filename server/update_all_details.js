@@ -1,5 +1,7 @@
 const dns = require('dns');
-dns.setServers(['1.1.1.1', '1.0.0.1']);
+if (process.platform === 'win32') {
+  dns.setServers(['1.1.1.1', '1.0.0.1']);
+}
 const mongoose = require('mongoose');
 const MyConstants = require('./utils/MyConstants');
 const Models = require('./models/Models');

@@ -1,7 +1,9 @@
 const dns = require('dns');
-if (!process.env.RENDER) {
+// Chỉ thiết lập lại DNS trên môi trường Windows (Local dev) để tránh lỗi mạng nội bộ trên Render
+if (process.platform === 'win32') {
   dns.setServers(['1.1.1.1', '1.0.0.1']);
 }
+
 const mongoose = require('mongoose');
 const MyConstants = require('./MyConstants');
 
