@@ -34,20 +34,15 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
-// 4. Deployment (Phục vụ file static từ thư mục Build của React)
-// Phải đặt sau các API để không bị ghi đè link
-app.use('/admin', express.static(path.resolve(__dirname, '../client-admin/build')));
+// 4. Deployment (Phục vụ file static từ thư mục Build đã copy vào Server)
+app.use('/admin', express.static(path.resolve(__dirname, 'admin-build')));
 app.get('/admin/*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client-admin/build', 'index.html'), err => {
-    if (err) res.status(500).send("Lỗi tải trang Admin. Vui lòng kiểm tra lại quá trình build trên Render.");
-  });
+  res.sendFile(path.resolve(__dirname, 'admin-build', 'index.html'));
 });
 
-app.use('/', express.static(path.resolve(__dirname, '../client-customer/build')));
+app.use('/', express.static(path.resolve(__dirname, 'customer-build')));
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client-customer/build', 'index.html'), err => {
-    if (err) res.status(500).send("Lỗi tải trang Customer. Vui lòng kiểm tra lại quá trình build trên Render.");
-  });
+  res.sendFile(path.resolve(__dirname, 'customer-build', 'index.html'));
 });
 
 

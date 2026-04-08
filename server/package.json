@@ -12,7 +12,7 @@
     "nodemailer": "^6.9.5"
   },
   "scripts": {
-    "build": "npm install && cd ../client-admin && npm install && npm run build && cd ../client-customer && npm install && npm run build",
+    "build": "npm install && cd ../client-admin && npm install && npm run build && cd ../server && cp -r ../client-admin/build ./admin-build && cd ../client-customer && npm install && npm run build && cd ../server && cp -r ../client-customer/build ./customer-build",
     "start": "node index.js"
   }
 }
