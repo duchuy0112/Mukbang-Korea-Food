@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import MyContext from '../contexts/MyContext';
 
 class Home extends Component {
@@ -32,13 +33,19 @@ class Home extends Component {
         });
       });
 
-    // Lấy danh sách sản phẩm để tìm món bán chạy nhất (giả lập dựa trên danh sách thật)
-    axios.get('/api/admin/products', { headers: { 'x-access-token': this.context.token } })
+    // Lấy danh sách sản phẩm để tìm món bán chạy nhất
+    // API trả về { products, noPages, curPage } nên cần lấy .products
+    axios.get('/api/admin/products?page=1', { headers: { 'x-access-token': this.context.token } })
       .then((res) => {
-        const prods = Array.isArray(res.data) ? res.data : [];
+        // Xử lý cả 2 dạng: array thuần hoặc object phân trang
+        const prods = Array.isArray(res.data)
+          ? res.data
+          : (Array.isArray(res.data?.products) ? res.data.products : []);
+        // Lọc bỏ sản phẩm không có category
+        const validProds = prods.filter(p => p.category !== null);
         this.setState({
-          topSelling: prods[0] || null,
-          trendingProducts: prods.slice(1, 4) // Lấy 3 món tiếp theo
+          topSelling: validProds[0] || null,
+          trendingProducts: validProds.slice(1, 4) // Lấy 3 món tiếp theo
         });
       });
   }
@@ -47,90 +54,91 @@ class Home extends Component {
     return (
       <div className="admin-dashboard-container">
         <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
           .admin-dashboard-container {
-            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
             padding-top: 10px;
+            font-family: 'Inter', sans-serif;
           }
 
           @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
           }
 
           .welcome-row {
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
           }
 
           .welcome-title {
-            font-size: 36px;
+            font-size: 30px;
             font-weight: 900;
             color: #1a1a1a;
-            margin: 0;
-            letter-spacing: -1.5px;
-            background: linear-gradient(90deg, #1a1a1a 0%, #d32f2f 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin: 0 0 6px;
+            letter-spacing: -1px;
           }
 
           .welcome-sub {
-            color: #777;
-            font-size: 15px;
-            margin-top: 8px;
-            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            margin-top: 0;
+            font-weight: 500;
           }
 
           /* DASHBOARD STATS */
           .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1.2fr;
-            gap: 25px;
-            margin-bottom: 45px;
+            gap: 20px;
+            margin-bottom: 24px;
           }
 
           .stat-card {
-            padding: 28px;
-            border-radius: 30px;
+            padding: 24px;
+            border-radius: 24px;
             color: white;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 200px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-height: 165px;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(255,255,255,0.1);
           }
 
           .stat-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
           }
 
-          .stat-inner-label { 
-            font-size: 12px; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            letter-spacing: 1.8px; 
-            opacity: 0.85; 
+          .stat-inner-label {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            opacity: 0.85;
           }
-          
-          .stat-value { 
-            font-size: 34px; 
-            font-weight: 900; 
-            margin: 12px 0; 
+
+          .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            margin: 8px 0;
             display: flex;
             align-items: baseline;
             gap: 5px;
           }
-          .stat-value small { font-size: 20px; opacity: 0.8; }
+          .stat-value small { font-size: 16px; opacity: 0.8; }
 
           .stat-badge {
             background: rgba(255,255,255,0.15);
             backdrop-filter: blur(10px);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 50px;
             font-size: 11px;
             font-weight: 800;
@@ -140,32 +148,34 @@ class Home extends Component {
 
           .card-sales { background: linear-gradient(135deg, #c32d20 0%, #f44336 100%); }
           .card-orders { background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); }
-          .card-customers { background: #ffffff; color: #1a1a1a; border: 1px solid #f0f0f0; }
-          .card-customers .stat-inner-label { color: #333; } /* Chữ đậm hơn để tăng độ tương phản */
+          .card-customers { background: #ffffff; color: #1a1a1a; border: 1px solid #f0f0f0; box-shadow: 0 8px 30px rgba(0,0,0,0.04); }
+          .card-customers .stat-inner-label { color: #555; }
           .card-customers .stat-badge { background: #fdf5f5; border: 1px solid #fee2e2; color: #d32f2f; }
 
           .top-selling-card {
             background: #fff;
-            padding: 28px;
-            border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
             display: flex;
             align-items: center;
-            gap: 22px;
-            border: 1px solid #f8f8f8;
+            gap: 18px;
+            border: 1px solid #f0f0f0;
             transition: 0.3s;
+            min-height: 165px;
           }
-          .top-selling-card:hover { border-color: #fee2e2; transform: translateY(-5px); }
+          .top-selling-card:hover { border-color: #fecaca; transform: translateY(-4px); box-shadow: 0 12px 35px rgba(0,0,0,0.06); }
 
           .prod-img-mini {
-            width: 85px; height: 85px;
-            border-radius: 22px;
+            width: 68px; height: 68px;
+            border-radius: 16px;
             background: #fdf5f5;
             display: flex; align-items: center; justify-content: center;
-            font-size: 32px;
+            font-size: 26px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(211,47,47,0.05);
+            box-shadow: 0 6px 16px rgba(211,47,47,0.06);
             border: 1px solid #fef2f2;
+            flex-shrink: 0;
           }
           .prod-img-mini img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -173,95 +183,94 @@ class Home extends Component {
           .dashboard-main-row {
             display: grid;
             grid-template-columns: 2.2fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 20px;
+            margin-bottom: 20px;
           }
 
           .chart-panel {
             background: #fff;
-            padding: 35px;
-            border-radius: 35px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.03);
-            min-height: 420px;
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+            min-height: 360px;
             display: flex;
             flex-direction: column;
-            border: 1px solid #f5f5f5;
+            border: 1px solid #f0f0f0;
           }
 
           .trending-panel {
-            background: #fffafa;
-            padding: 35px;
-            border-radius: 35px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.03);
-            border: 1px solid #fff0f0;
+            background: #fff;
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
           }
 
-          .panel-title { font-size: 22px; font-weight: 900; color: #1a1a1a; margin: 0 0 8px; }
-          .panel-sub { font-size: 14px; color: #888; margin-bottom: 30px; font-weight: 500; }
+          .panel-title { font-size: 17px; font-weight: 900; color: #1a1a1a; margin: 0 0 4px; }
+          .panel-sub { font-size: 13px; color: #aaa; margin-bottom: 18px; font-weight: 500; }
 
           .revenue-legend {
-             display: flex; gap: 20px; justify-content: flex-end; margin-bottom: 25px;
+            display: flex; gap: 16px; justify-content: flex-end; margin-bottom: 14px;
           }
-          .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: #666; }
-          .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+          .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: #777; }
+          .dot { width: 10px; height: 10px; border-radius: 50%; }
 
           .trend-item {
-            background: #fff;
-            padding: 18px;
-            border-radius: 24px;
-            margin-bottom: 15px;
+            background: #fafafa;
+            padding: 13px 15px;
+            border-radius: 16px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 18px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            border: 1.5px solid #f9f9f9;
+            gap: 14px;
+            transition: all 0.3s;
+            border: 1.5px solid #f0f0f0;
             text-decoration: none;
             color: inherit;
           }
-          .trend-item:hover { transform: translateX(8px); border-color: #ff9f43; box-shadow: 0 10px 25px rgba(255,159,67,0.1); }
+          .trend-item:hover { transform: translateX(6px); border-color: #ff9f43; background: #fffaf5; box-shadow: 0 6px 18px rgba(255,159,67,0.08); }
 
           .btn-view-all {
             width: 100%;
-            padding: 16px;
-            background: #b3261e; /* Chuyển sang Solid button */
+            padding: 13px;
+            background: linear-gradient(135deg, #c62828 0%, #d32f2f 100%);
             border: none;
-            border-radius: 18px;
+            border-radius: 14px;
             color: #fff;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 14px;
             transition: all 0.3s;
-            box-shadow: 0 8px 25px rgba(179,38,30,0.15);
+            box-shadow: 0 6px 20px rgba(198,40,40,0.2);
+            font-family: 'Inter', sans-serif;
           }
-          .btn-view-all:hover { 
-            background: #991f19; 
-            transform: translateY(-3px); 
-            box-shadow: 0 12px 30px rgba(179,38,30,0.3); 
+          .btn-view-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(198,40,40,0.3);
           }
 
           /* TABLE STYLING */
           .recent-orders-panel {
             background: #fff;
-            padding: 35px;
-            border-radius: 35px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.03);
-            border: 1px solid #f5f5f5;
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
           }
-          .order-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 15px; }
-          .order-table th { text-align: left; padding: 10px 20px; color: #aaa; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-          .order-table td { padding: 20px; font-size: 14px; background: #fafafa; transition: 0.2s; font-weight: 600; }
-          .order-table tr td:first-child { border-radius: 15px 0 0 15px; }
-          .order-table tr td:last-child { border-radius: 0 15px 15px 0; }
-          .order-table tr:hover td { background: #fff5f5; color: #b3261e; }
-          
-          .status-chip { padding: 6px 14px; border-radius: 50px; font-weight: 900; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+          .order-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+          .order-table th { text-align: left; padding: 12px 16px; color: #aaa; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #f0f0f0; }
+          .order-table td { padding: 15px 16px; font-size: 13px; border-bottom: 1px solid #f8f8f8; font-weight: 600; color: #555; transition: 0.2s; }
+          .order-table tr:last-child td { border-bottom: none; }
+          .order-table tbody tr:hover td { background: #fff8f5; color: #c62828; }
+
+          .status-chip { padding: 5px 12px; border-radius: 50px; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
           .chart-container-svg {
             flex: 1;
             width: 100%;
-            height: 250px;
-            margin-top: 20px;
+            height: 230px;
+            margin-top: 8px;
           }
         `}</style>
 
@@ -322,46 +331,74 @@ class Home extends Component {
             <div className="panel-sub">Theo dõi hiệu suất doanh thu hàng tháng</div>
 
             <div className="revenue-legend">
-              <div className="legend-item"><div className="dot" style={{ background: '#c32d20' }}></div> Trực tuyến</div>
-              <div className="legend-item"><div className="dot" style={{ background: '#8b4513' }}></div> Mang về</div>
+              <div className="legend-item"><div className="dot" style={{ background: '#ff416c' }}></div> Trực tuyến</div>
+              <div className="legend-item"><div className="dot" style={{ background: '#f5af19' }}></div> Mang về</div>
             </div>
 
             <div className="chart-container-svg">
-              <svg width="100%" height="100%" viewBox="0 0 600 220" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+              <svg width="100%" height="100%" viewBox="0 0 600 230" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
                 <defs>
-                  <linearGradient id="homeWaveGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgba(195,45,32,0.3)" />
-                    <stop offset="100%" stopColor="rgba(195,45,32,0)" />
+                  <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgba(255, 65, 108, 0.4)" />
+                    <stop offset="100%" stopColor="rgba(255, 65, 108, 0)" />
                   </linearGradient>
-                  <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+                  <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
                     <feOffset dx="0" dy="8" result="offsetblur" />
-                    <feComponentTransfer><feFuncA type="linear" slope="0.2" /></feComponentTransfer>
+                    <feComponentTransfer><feFuncA type="linear" slope="0.35" /></feComponentTransfer>
                     <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
                   </filter>
                 </defs>
 
-                {/* Decorative Grid Lines */}
-                {[0, 0.25, 0.5, 0.75, 1].map((f, i) => (
-                  <line key={i} x1="0" y1={200 - 180 * f} x2="600" y2={200 - 180 * f} stroke="#f0f0f0" strokeWidth="1" strokeDasharray="5,5" />
+                {/* Grid Lines */}
+                {[0, 1, 2, 3].map((f) => (
+                  <g key={f}>
+                    <line x1="0" y1={40 + f * 50} x2="600" y2={40 + f * 50} stroke="#f5f5f5" strokeWidth="1.5" strokeDasharray="6,6" />
+                  </g>
                 ))}
 
-                {/* Wave Path for Online (Red) */}
-                <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50 L 600 200 L 0 200 Z" fill="url(#homeWaveGrad)" />
-                <path d="M 0 160 C 100 160, 150 80, 200 80 C 250 80, 300 180, 400 120 C 500 60, 550 40, 600 50" fill="none" stroke="#c32d20" strokeWidth="4" strokeLinecap="round" filter="url(#softShadow)" />
-
-                {/* Second Path for Takeaway (Brown) */}
-                <path d="M 0 180 C 100 180, 200 150, 300 160 C 400 170, 500 110, 600 130" fill="none" stroke="#8b4513" strokeWidth="4" strokeDasharray="8,5" opacity="0.6" strokeLinecap="round" />
-
-                {/* Animated Dots for primary path */}
-                <circle cx="200" cy="80" r="5" fill="#fff" stroke="#c32d20" strokeWidth="2.5" />
-                <circle cx="400" cy="120" r="5" fill="#fff" stroke="#c32d20" strokeWidth="2.5" />
-                <circle cx="600" cy="50" r="5" fill="#fff" stroke="#c32d20" strokeWidth="2.5" />
-
-                {/* Month Labels */}
-                {['T1', 'T2', 'T3', 'T4', 'T5', 'T6'].map((m, i) => (
-                  <text key={i} x={i * 120} y="215" textAnchor="middle" fill="#999" fontSize="12" fontWeight="800">{m}</text>
+                {/* X-axis labels */}
+                {['Thg 1', 'Thg 2', 'Thg 3', 'Thg 4', 'Thg 5', 'Thg 6'].map((m, i) => (
+                  <text key={i} x={i * 100 + 50} y="220" textAnchor="middle" fill="#999" fontSize="13" fontWeight="800">{m}</text>
                 ))}
+
+                {/* Area Fill */}
+                <path 
+                  d="M 50 140 C 80 140, 120 80, 150 80 C 180 80, 220 120, 250 120 C 280 120, 320 50, 350 50 C 380 50, 420 100, 450 100 C 480 100, 520 20, 550 20 L 550 190 L 50 190 Z" 
+                  fill="url(#bgGrad)" 
+                />
+
+                {/* Secondary Line (Takeaway) */}
+                <path 
+                  d="M 50 160 C 80 160, 120 140, 150 140 C 180 140, 220 150, 250 150 C 280 150, 320 110, 350 110 C 380 110, 420 130, 450 130 C 480 130, 520 100, 550 100" 
+                  fill="none" 
+                  stroke="#f5af19" 
+                  strokeWidth="3.5" 
+                  strokeDasharray="8,6" 
+                  strokeLinecap="round"
+                />
+
+                {/* Primary Line (Online) */}
+                <path 
+                  d="M 50 140 C 80 140, 120 80, 150 80 C 180 80, 220 120, 250 120 C 280 120, 320 50, 350 50 C 380 50, 420 100, 450 100 C 480 100, 520 20, 550 20" 
+                  fill="none" 
+                  stroke="#ff416c" 
+                  strokeWidth="5" 
+                  strokeLinecap="round" 
+                  filter="url(#lineGlow)" 
+                />
+
+                {/* Data Points */}
+                {[{x:50, y:140}, {x:150, y:80}, {x:250, y:120}, {x:350, y:50}, {x:450, y:100}, {x:550, y:20}].map((p, idx) => (
+                  <circle key={idx} cx={p.x} cy={p.y} r="6" fill="#fff" stroke="#ff416c" strokeWidth="3.5" />
+                ))}
+
+                {/* Tooltip on the highest point (Thg 6) */}
+                <g transform="translate(550, 20)">
+                  <rect x="-42" y="-38" width="84" height="28" rx="8" fill="#1a1a1a" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.15))" />
+                  <polygon points="0,-10 -6,-16 6,-16" fill="#1a1a1a" />
+                  <text x="0" y="-19" fill="#fff" fontSize="12" fontWeight="800" textAnchor="middle">18.5M đ</text>
+                </g>
               </svg>
             </div>
           </div>
@@ -371,7 +408,7 @@ class Home extends Component {
             <div className="panel-sub">Khách hàng đang ưu tiên đặt món nào?</div>
 
             {this.state.trendingProducts.map((p, idx) => (
-              <a href="#" key={p._id} className="trend-item">
+              <Link to="/admin/product" key={p._id} className="trend-item">
                 <div className="prod-img-mini" style={{ width: '50px', height: '50px', fontSize: '20px' }}>
                   <img src={'data:image/jpg;base64,' + p.image} alt={p.name} />
                 </div>
@@ -382,10 +419,10 @@ class Home extends Component {
                     {p.price?.toLocaleString()} đ
                   </div>
                 </div>
-              </a>
+              </Link>
             ))}
 
-            <button className="btn-view-all">Xem tất cả sản phẩm</button>
+            <Link to="/admin/product" className="btn-view-all" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>Xem tất cả sản phẩm →</Link>
           </div>
         </div>
 
@@ -393,7 +430,7 @@ class Home extends Component {
         <div className="recent-orders-panel">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div className="panel-title">Đơn hàng gần nhất</div>
-            <a href="/admin/order" style={{ color: '#b3261e', textDecoration: 'none', fontSize: '13px', fontWeight: 800 }}>Xem tất cả lịch sử →</a>
+            <Link to="/admin/order" style={{ color: '#b3261e', textDecoration: 'none', fontSize: '13px', fontWeight: 800 }}>Xem tất cả lịch sử →</Link>
           </div>
 
           <table className="order-table">

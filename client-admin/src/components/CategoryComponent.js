@@ -17,160 +17,196 @@ class Category extends Component {
     const cates = this.state.categories.map((item) => {
       const isSelected = this.state.itemSelected?._id === item._id;
       return (
-        <tr 
-          key={item._id} 
-          className={`k-tr ${isSelected ? 'k-active' : ''}`} 
+        <tr
+          key={item._id}
+          className={`cat-row ${isSelected ? 'cat-row-active' : ''}`}
           onClick={() => this.trItemClick(item)}
         >
-          <td className="k-id">#{item._id.substring(item._id.length - 6).toUpperCase()}</td>
-          <td className="k-name-cell">{item.name}</td>
-          <td className="k-status">
-            <span className="k-status-badge">Đang kinh doanh</span>
+          <td><span className="cat-id">#{item._id.substring(item._id.length - 6).toUpperCase()}</span></td>
+          <td><span className="cat-name">{item.name}</span></td>
+          <td>
+            <span className="cat-status-badge">Đang kinh doanh</span>
+          </td>
+          <td>
+            <span className={`cat-select-btn ${isSelected ? 'selected' : ''}`}>
+              {isSelected ? '✓ Đang chỉnh sửa' : 'Chọn'}
+            </span>
           </td>
         </tr>
       );
     });
 
     return (
-      <div className="korea-light-admin">
+      <div className="cat-page">
         <style>{`
-          .korea-light-admin {
-            padding: 40px;
-            background-color: #f9f7f5; /* Màu nền giấy Hanji sáng */
-            min-height: 100vh;
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+          .cat-page {
+            padding: 10px 0 40px;
             font-family: 'Inter', sans-serif;
+            animation: cat-fadeIn 0.6s ease-out;
           }
 
-          .k-layout {
+          @keyframes cat-fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+
+          .cat-header {
             display: flex;
-            gap: 30px;
-            max-width: 1300px;
-            margin: 0 auto;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+          }
+
+          .cat-header h1 {
+            font-size: 30px;
+            font-weight: 900;
+            color: #1a1a1a;
+            margin: 0 0 6px;
+            letter-spacing: -1px;
+          }
+
+          .cat-header-sub {
+            font-size: 14px;
+            color: #999;
+            font-weight: 500;
+          }
+
+          .cat-count-badge {
+            background: #fff5f5;
+            color: #c62828;
+            border: 1.5px solid #fecaca;
+            border-radius: 50px;
+            padding: 6px 18px;
+            font-size: 13px;
+            font-weight: 800;
+          }
+
+          .cat-layout {
+            display: flex;
+            gap: 24px;
             align-items: flex-start;
           }
 
-          /* KHỐI DANH SÁCH SÁNG SỦA */
-          .k-section-list {
-            flex: 1.5;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #e5e7eb; /* Viền xám nhạt thanh lịch */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            position: relative;
+          .cat-table-wrapper {
+            flex: 1.4;
+            background: #fff;
+            border-radius: 24px;
             overflow: hidden;
+            box-shadow: 0 8px 35px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
           }
 
-          /* VIỀN HOA VĂN MỜ ĐỎ-CAM Ở GÓC */
-          .k-section-list::before {
-            content: '✿';
-            position: absolute;
-            top: -10px; right: -10px;
-            font-size: 100px;
-            color: rgba(211, 47, 47, 0.03);
-          }
-
-          .k-section-detail {
-            flex: 1;
-            position: sticky;
-            top: 40px;
-          }
-
-          .k-title {
-            color: #d32f2f; /* Đỏ đặc trưng */
-            font-weight: 900;
-            font-size: 24px;
-            text-align: center;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-          }
-
-          .k-title span {
-            color: #ff8c00; /* Nhấn màu Cam */
-          }
-
-          .k-table {
+          .cat-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px; /* Tạo khoảng cách giữa các hàng */
+            border-collapse: collapse;
           }
 
-          .k-table thead th {
-            background: #f1f5f9; /* MÀU XÁM SÁNG HIỆN ĐẠI */
-            color: #475569; /* Chữ xám đậm dễ đọc */
-            padding: 15px;
-            font-weight: 800;
+          .cat-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 900;
+            color: #aaa;
             text-transform: uppercase;
-            font-size: 12px;
-            border-bottom: 3px solid #ff9f43; /* Gạch chân màu Cam */
-            border-radius: 8px 8px 0 0;
+            letter-spacing: 1px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
           }
 
-          .k-tr {
-            background: #ffffff;
-            transition: all 0.3s ease;
+          .cat-row {
+            border-bottom: 1px solid #f5f5f5;
             cursor: pointer;
+            transition: all 0.25s;
           }
 
-          .k-tr td {
-            padding: 15px;
-            text-align: center;
-            border-top: 1px solid #f3f4f6;
-            border-bottom: 1px solid #f3f4f6;
+          .cat-row:last-child { border-bottom: none; }
+
+          .cat-row:hover { background: #fffaf5; }
+
+          .cat-row-active { background: #fff8f5 !important; }
+
+          .cat-row td {
+            padding: 16px 20px;
+            font-size: 14px;
+            vertical-align: middle;
           }
 
-          .k-tr td:first-child { border-left: 1px solid #f3f4f6; border-radius: 12px 0 0 12px; }
-          .k-tr td:last-child { border-right: 1px solid #f3f4f6; border-radius: 0 12px 12px 0; }
-
-          .k-tr:hover {
-            background: #fff5f5;
-            transform: scale(1.01);
+          .cat-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #bbb;
+            font-weight: 700;
           }
 
-          /* TRẠNG THÁI ACTIVE RỰC RỠ */
-          .k-active {
-            background: #fff1f1 !important;
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.1);
+          .cat-name {
+            font-weight: 800;
+            color: #1a1a1a;
+            font-size: 15px;
           }
 
-          .k-active td {
-            border-color: #fecaca !important;
-            color: #d32f2f !important;
-          }
-
-          .k-active .k-name-cell {
-            color: #d32f2f;
-          }
-
-          .k-id { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #94a3b8; }
-          .k-name-cell { font-weight: 800; color: #334155; font-size: 16px; }
-
-          /* BADGE TRẠNG THÁI MÀU CAM-ĐỎ */
-          .k-status-badge {
-            background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 100%);
-            color: white;
-            padding: 4px 12px;
+          .cat-status-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+            padding: 5px 14px;
             border-radius: 50px;
             font-size: 11px;
             font-weight: 800;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);
+          }
+
+          .cat-select-btn {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            background: #f5f5f5;
+            color: #888;
+            transition: all 0.2s;
+            cursor: pointer;
+          }
+
+          .cat-row:hover .cat-select-btn {
+            background: #fff3f3;
+            color: #c62828;
+          }
+
+          .cat-select-btn.selected {
+            background: linear-gradient(135deg, #c62828 0%, #e53935 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(198,40,40,0.25);
+          }
+
+          .cat-detail-wrapper {
+            flex: 1;
+            position: sticky;
+            top: 10px;
           }
 
           @media (max-width: 1024px) {
-            .k-layout { flex-direction: column; }
+            .cat-layout { flex-direction: column; }
           }
         `}</style>
 
-        <div className="k-layout">
-          <div className="k-section-list">
-            <h2 className="k-title">Quản Lý <span>Danh Mục</span></h2>
-            <table className="k-table">
+        <div className="cat-header">
+          <div>
+            <h1>Quản lý Danh mục</h1>
+            <div className="cat-header-sub">Quản lý toàn bộ danh mục món ăn trong hệ thống</div>
+          </div>
+          <span className="cat-count-badge">{this.state.categories.length} danh mục</span>
+        </div>
+
+        <div className="cat-layout">
+          <div className="cat-table-wrapper">
+            <table className="cat-table">
               <thead>
                 <tr>
                   <th>Mã số</th>
                   <th>Tên danh mục</th>
                   <th>Trạng thái</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,10 +215,10 @@ class Category extends Component {
             </table>
           </div>
 
-          <div className="k-section-detail">
-            <CategoryDetail 
-              item={this.state.itemSelected} 
-              updateCategories={this.updateCategories} 
+          <div className="cat-detail-wrapper">
+            <CategoryDetail
+              item={this.state.itemSelected}
+              updateCategories={this.updateCategories}
             />
           </div>
         </div>
@@ -200,7 +236,7 @@ class Category extends Component {
     });
   }
 
-  updateCategories = (categories) => { 
+  updateCategories = (categories) => {
     this.setState({ categories: categories, itemSelected: null });
   }
 }

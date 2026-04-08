@@ -307,96 +307,91 @@ class RevenueReport extends Component {
         </Helmet>
 
         <style>{`
-          .rv-page { padding: 28px 32px; min-height: 92vh; font-family: 'Inter','Segoe UI',sans-serif; background: linear-gradient(135deg,#fafafa 0%,#fff5f0 100%); }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+          .rv-page { padding: 10px 0 40px; font-family: 'Inter', sans-serif; animation: rv-fade 0.6s ease-out; }
+          @keyframes rv-fade { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
           .rv-page *, .rv-page *::before, .rv-page *::after { box-sizing: border-box; }
 
           /* HEADER */
-          .rv-header { text-align:center; margin-bottom:12px; }
-          .rv-title { color:#d32f2f; font-size:30px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; margin:0 0 6px; }
-          .rv-subtitle { color:#888; font-size:14px; margin:0; }
+          .rv-header { margin-bottom: 24px; }
+          .rv-title { color: #1a1a1a; font-size: 30px; font-weight: 900; letter-spacing: -1px; margin: 0 0 6px; }
+          .rv-subtitle { color: #999; font-size: 14px; margin: 0; font-weight: 500; }
 
           /* FILTER BAR */
-          .rv-filter-bar { background:#fff; border-radius:16px; padding:18px 24px; margin-bottom:24px; box-shadow:0 4px 16px rgba(0,0,0,.04); border:1px solid #f0f0f0; display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
-          .rv-filter-label { font-weight:800; font-size:13px; color:#555; text-transform:uppercase; letter-spacing:.5px; margin-right:4px; }
+          .rv-filter-bar { background:#fff; border-radius:16px; padding:16px 22px; margin-bottom:22px; box-shadow:0 4px 16px rgba(0,0,0,.04); border:1px solid #f0f0f0; display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+          .rv-filter-label { font-weight:800; font-size:12px; color:#aaa; text-transform:uppercase; letter-spacing:.5px; margin-right:4px; }
           .rv-filter-btns { display:flex; gap:6px; flex-wrap:wrap; }
-          .rv-fbtn { border:1.5px solid #e5e5e5; background:#fafafa; color:#666; padding:7px 16px; border-radius:10px; cursor:pointer; font-size:12px; font-weight:700; transition:all .25s; }
-          .rv-fbtn:hover { border-color:#ff9f43; color:#d32f2f; background:#fff5f0; }
-          .rv-fbtn.active { background:linear-gradient(135deg,#ff9f43,#d32f2f); color:white; border-color:transparent; box-shadow:0 4px 12px rgba(211,47,47,.25); }
+          .rv-fbtn { border:1.5px solid #eee; background:#fff; color:#777; padding:7px 16px; border-radius:10px; cursor:pointer; font-size:12px; font-weight:700; transition:all .2s; font-family:'Inter',sans-serif; }
+          .rv-fbtn:hover { border-color:#d32f2f; color:#d32f2f; background:#fff5f5; }
+          .rv-fbtn.active { background:linear-gradient(135deg,#c62828,#d32f2f); color:white; border-color:transparent; box-shadow:0 4px 14px rgba(198,40,40,.25); }
           .rv-filter-dates { display:flex; align-items:center; gap:8px; margin-left:auto; }
-          .rv-filter-dates label { font-size:12px; font-weight:600; color:#777; }
-          .rv-date-input { border:1.5px solid #e5e5e5; border-radius:8px; padding:6px 10px; font-size:12px; font-family:inherit; color:#333; outline:none; transition:border .2s; }
+          .rv-filter-dates label { font-size:12px; font-weight:700; color:#aaa; }
+          .rv-date-input { border:1.5px solid #eee; border-radius:10px; padding:7px 12px; font-size:12px; font-family:'Inter',sans-serif; color:#333; outline:none; transition:border .2s; }
           .rv-date-input:focus { border-color:#d32f2f; }
-          .rv-date-sep { color:#ccc; font-size:12px; }
-          .rv-filter-count { font-size:12px; color:#999; margin-left:8px; font-style:italic; }
+          .rv-date-sep { color:#ccc; font-size:13px; }
+          .rv-filter-count { font-size:12px; color:#bbb; margin-left:6px; font-weight:600; }
 
           /* KPI CARDS */
-          .rv-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:32px; }
-          .rv-kpi { border-radius:18px; padding:22px 24px; color:white; position:relative; overflow:hidden; box-shadow:0 8px 28px rgba(0,0,0,.12); }
-          .rv-kpi::after { content:''; position:absolute; top:-30px; right:-30px; width:100px; height:100px; border-radius:50%; background:rgba(255,255,255,.12); }
-          .rv-kpi h2 { margin:0 0 8px; font-size:13px; text-transform:uppercase; opacity:.85; letter-spacing:.5px; }
-          .rv-kpi p { margin:0; font-size:26px; font-weight:900; }
-          .rv-kpi span { display:block; font-size:11px; margin-top:6px; opacity:.7; }
+          .rv-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; margin-bottom:24px; }
+          .rv-kpi { border-radius:20px; padding:20px 22px; color:white; position:relative; overflow:hidden; box-shadow:0 8px 28px rgba(0,0,0,.1); transition: all 0.3s; }
+          .rv-kpi:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(0,0,0,.14); }
+          .rv-kpi::after { content:''; position:absolute; top:-30px; right:-30px; width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,.1); }
+          .rv-kpi h2 { margin:0 0 6px; font-size:11px; text-transform:uppercase; opacity:.85; letter-spacing:.8px; font-weight:900; }
+          .rv-kpi p { margin:0; font-size:24px; font-weight:900; }
+          .rv-kpi span { display:block; font-size:11px; margin-top:6px; opacity:.7; font-weight:600; }
           .rv-kpi-1 { background:linear-gradient(135deg,#16a34a,#15803d); }
-          .rv-kpi-2 { background:linear-gradient(135deg,#ff9f43,#d32f2f); }
+          .rv-kpi-2 { background:linear-gradient(135deg,#c62828,#d32f2f); }
           .rv-kpi-3 { background:linear-gradient(135deg,#3b82f6,#1d4ed8); }
           .rv-kpi-4 { background:linear-gradient(135deg,#f59e0b,#d97706); }
 
           /* SECTIONS */
-          .rv-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
+          .rv-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
           @media(max-width:900px){ .rv-grid{grid-template-columns:1fr;} .rv-filter-dates{margin-left:0;width:100%;} }
-          .rv-card { background:#fff; border-radius:18px; padding:24px 28px; box-shadow:0 6px 24px rgba(0,0,0,.05); border:1px solid #f0f0f0; }
-          .rv-card-title { color:#d32f2f; font-size:17px; font-weight:800; margin:0 0 18px; display:flex; align-items:center; gap:8px; border-bottom:2px solid #ff9f43; padding-bottom:10px; text-transform:uppercase; letter-spacing:.3px; }
+          .rv-card { background:#fff; border-radius:20px; padding:22px 26px; box-shadow:0 6px 24px rgba(0,0,0,.04); border:1px solid #f0f0f0; }
+          .rv-card-title { color:#1a1a1a; font-size:15px; font-weight:900; margin:0 0 16px; display:flex; align-items:center; gap:8px; border-bottom:2px solid #f0f0f0; padding-bottom:12px; }
           .rv-full { grid-column: 1 / -1; }
 
           /* TOP PRODUCTS BAR */
           .rv-hbar { margin-bottom:14px; }
-          .rv-hbar-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
-          .rv-hbar-label strong { color:#333; }
-          .rv-hbar-label span { color:#16a34a; font-weight:800; }
-          .rv-hbar-track { height:22px; background:#f5f5f5; border-radius:11px; overflow:hidden; }
-          .rv-hbar-fill { height:100%; border-radius:11px; background:linear-gradient(90deg,#ff9f43,#d32f2f); transition:width .8s ease; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; }
-          .rv-hbar-fill span { font-size:10px; color:white; font-weight:700; }
+          .rv-hbar-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; }
+          .rv-hbar-label strong { color:#1a1a1a; font-weight:800; }
+          .rv-hbar-label span { color:#16a34a; font-weight:800; font-size:12px; }
+          .rv-hbar-track { height:20px; background:#f5f5f5; border-radius:10px; overflow:hidden; }
+          .rv-hbar-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#ff9f43,#c62828); transition:width .8s ease; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; }
+          .rv-hbar-fill span { font-size:10px; color:white; font-weight:800; }
 
           /* TOP CUSTOMERS */
           .rv-cust-row { display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid #f5f5f5; }
           .rv-cust-row:last-child { border-bottom:none; }
-          .rv-cust-rank { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; color:white; flex-shrink:0; }
+          .rv-cust-rank { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:white; flex-shrink:0; }
           .rv-cust-rank.r1 { background:linear-gradient(135deg,#f59e0b,#d97706); }
           .rv-cust-rank.r2 { background:linear-gradient(135deg,#9ca3af,#6b7280); }
           .rv-cust-rank.r3 { background:linear-gradient(135deg,#b45309,#92400e); }
-          .rv-cust-rank.r4,.rv-cust-rank.r5 { background:#e5e7eb; color:#666; }
+          .rv-cust-rank.r4,.rv-cust-rank.r5 { background:#eeeeee; color:#888; }
           .rv-cust-info { flex:1; }
-          .rv-cust-info strong { display:block; color:#222; font-size:14px; }
-          .rv-cust-info span { color:#999; font-size:12px; }
-          .rv-cust-total { font-weight:800; color:#d32f2f; font-size:14px; white-space:nowrap; }
+          .rv-cust-info strong { display:block; color:#1a1a1a; font-size:14px; font-weight:800; }
+          .rv-cust-info span { color:#aaa; font-size:12px; font-weight:500; }
+          .rv-cust-total { font-weight:900; color:#c62828; font-size:14px; white-space:nowrap; }
 
           /* TABLE */
-          .rv-table { width:100%; border-collapse:collapse; font-size:14px; }
-          .rv-table th { background:#fff5f5; padding:14px 16px; text-align:left; color:#d32f2f; text-transform:uppercase; font-weight:800; font-size:12px; border-bottom:2px solid #d32f2f; }
-          .rv-table td { padding:14px 16px; border-bottom:1px solid #f3f3f3; color:#444; }
+          .rv-table { width:100%; border-collapse:collapse; font-size:13px; }
+          .rv-table th { background:#fafafa; padding:12px 16px; text-align:left; color:#aaa; text-transform:uppercase; font-weight:900; font-size:11px; border-bottom:1px solid #f0f0f0; letter-spacing:1px; }
+          .rv-table td { padding:14px 16px; border-bottom:1px solid #f5f5f5; color:#555; font-weight:600; }
+          .rv-table tr:last-child td { border-bottom:none; }
           .rv-table tbody tr:hover td { background:#fffaf5; }
-          .rv-id-cell { font-family:'Fira Code',monospace; font-weight:700; color:#999; font-size:12px; }
-          .rv-bold { font-weight:700; color:#222; }
-          .rv-price { font-weight:800; color:#16a34a; }
-          .rv-empty { text-align:center; padding:40px 16px !important; color:#bbb; font-style:italic; }
+          .rv-id-cell { font-family:monospace; font-weight:700; color:#bbb; font-size:12px; }
+          .rv-bold { font-weight:800; color:#1a1a1a; }
+          .rv-price { font-weight:900; color:#16a34a; }
+          .rv-empty { text-align:center; padding:40px 16px !important; color:#ccc; font-weight:600; }
 
-          /* SEO & Accessibility Hidden Class */
-          .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
-          }
+          /* SEO Hidden */
+          .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border-width:0; }
         `}</style>
 
         {/* ── HEADER ── */}
         <header className="rv-header">
-          <h1 className="rv-title">📊 Bảng Báo Cáo Doanh Thu</h1>
+          <h1 className="rv-title">Báo cáo Doanh thu</h1>
           <p className="rv-subtitle">Tổng hợp phân tích kinh doanh — Mukbang Korea Food</p>
         </header>
 
