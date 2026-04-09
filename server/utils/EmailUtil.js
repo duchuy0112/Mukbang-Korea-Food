@@ -10,26 +10,19 @@ const transporter = nodemailer.createTransport({
 });
 
 const EmailUtil = {
-  send(email, id, token) {
-    const text =
-      'Thanks for signing up, please input these informations to activate your account:\n' +
-      '\t.id: ' +
-      id +
-      '\n' +
-      '\t.token: ' +
-      token;
-
+  send(email, subject, text) {
     return new Promise(function (resolve, reject) {
       const mailOptions = {
         from: MyConstants.EMAIL_USER,
         to: email,
-        subject: 'Signup | Verification',
+        subject: subject,
         text: text
       };
 
       transporter.sendMail(mailOptions, function (err, result) {
         if (err) {
-          reject(err);
+          console.error('Email sending failed:', err);
+          resolve(false); // Resolve to false instead of rejecting to avoid unhandled promise rejections
         } else {
           resolve(true);
         }

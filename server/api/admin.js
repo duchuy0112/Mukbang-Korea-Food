@@ -188,7 +188,9 @@ router.get('/customers/sendmail/:id', JwtUtil.checkToken, async function (req, r
   const cust = await CustomerDAO.selectByID(_id);
 
   if (cust) {
-    const send = await EmailUtil.send(cust.email, cust._id, cust.token);
+    const subject = 'Signup | Verification (Admin Triggered)';
+    const text = `Thanks for signing up, please input these informations to activate your account:\n\t.id: ${cust._id}\n\t.token: ${cust.token}`;
+    const send = await EmailUtil.send(cust.email, subject, text);
     if (send) {
       res.json({ success: true, message: 'Please check email' });
     } else {

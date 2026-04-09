@@ -38,52 +38,65 @@ const otpStore = {}; // { email: { otp, data, expires } }
 
 // customer - Step 1: Send OTP
 router.post('/signup', async function (req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
-  const name = req.body.name;
-  const phone = req.body.phone;
-  const email = req.body.email;
-  const address = req.body.address;
+  const username = req.body.username?.trim();
+  const password = req.body.password; // Don't trim password
+  const name = req.body.name?.trim();
+  const phone = req.body.phone?.trim();
+  const email = req.body.email?.trim()?.toLowerCase();
+  const address = req.body.address?.trim();
 
-  const dbCust = await CustomerDAO.selectByUsernameOrEmail(username, email);
+  if (!username || !password || !name || !phone || !email || !address) {
+    return res.json({ success: false, message: 'Vui lòng cung cấp đầy đủ thông tin!' });
+  }
 
-  if (dbCust) {
-    res.json({ success: false, message: 'Tài khoản hoặc email đã tồn tại!' });
-  } else {
-    // Generate 6-digit OTP
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
-    
-    // Store OTP with expiration (5 minutes)
-    otpStore[email] = {
-      otp: otp,
-      data: { username, password, name, phone, email, address },
-      expires: Date.now() + 5 * 60 * 1000
-    };
+  try {
+    const dbCust = await CustomerDAO.selectByUsernameOrEmail(username, email);
 
-    // Send OTP via email
-    const sendmail = await EmailUtil.send(
-      email,
-      'Mã xác thực OTP - Mukbang Korea Food',
-      `Xin chào ${name},\n\nMã OTP xác thực tài khoản của bạn là: ${otp}\n\nMã có hiệu lực trong 5 phút.\nVui lòng không chia sẻ mã này với bất kỳ ai.\n\n— Mukbang Korea Food`
-    );
-
-    if (sendmail) {
-      res.json({ success: true, message: 'Mã OTP đã được gửi đến email của bạn!', requireOtp: true });
+    if (dbCust) {
+      res.json({ success: false, message: 'Tài khoản hoặc email đã tồn tại!' });
     } else {
-      res.json({ success: false, message: 'Gửi email thất bại. Vui lòng thử lại!' });
+      // Generate 6-digit OTP
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      
+      // Store OTP with expiration (5 minutes)
+      otpStore[email] = {
+        otp: otp,
+        data: { username, password, name, phone, email, address },
+        expires: Date.now() + 5 * 60 * 1000
+      };
+
+      // Send OTP via email
+      const result = await EmailUtil.send(
+        email,
+        'Mã xác thực OTP - Mukbang Korea Food',
+        `Xin chào ${name},\n\nMã OTP xác thực tài khoản của bạn là: ${otp}\n\nMã có hiệu lực trong 5 phút.\nVui lòng không chia sẻ mã này với bất kỳ ai.\n\n— Mukbang Korea Food`
+      );
+
+      if (result) {
+        res.json({ success: true, message: 'Mã OTP đã được gửi đến email của bạn!', requireOtp: true });
+      } else {
+        res.json({ success: false, message: 'Gửi email thất bại. Vui lòng kiểm tra lại email hoặc thử lại sau!' });
+      }
     }
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.json({ success: false, message: 'Đã có lỗi xảy ra trong quá trình đăng ký!' });
   }
 });
 
 // customer - Step 2: Verify OTP and create account
 router.post('/verify-otp', async function (req, res) {
-  const email = req.body.email;
-  const otp = req.body.otp;
+  const email = req.body.email?.trim()?.toLowerCase();
+  const otp = req.body.otp?.trim();
+
+  if (!email || !otp) {
+    return res.json({ success: false, message: 'Thông tin xác thực không hợp lệ!' });
+  }
 
   const stored = otpStore[email];
 
   if (!stored) {
-    return res.json({ success: false, message: 'Không tìm thấy mã OTP. Vui lòng đăng ký lại!' });
+    return res.json({ success: false, message: 'Không tìm thấy mã OTP cho email này. Vui lòng đăng ký lại!' });
   }
 
   if (Date.now() > stored.expires) {
@@ -95,24 +108,29 @@ router.post('/verify-otp', async function (req, res) {
     return res.json({ success: false, message: 'Mã OTP không đúng!' });
   }
 
-  // OTP valid — create customer account
-  const { username, password, name, phone, address } = stored.data;
-  const now = new Date().getTime();
-  const token = CryptoUtil.md5(now.toString());
+  try {
+    // OTP valid — create customer account
+    const { username, password, name, phone, address } = stored.data;
+    const now = new Date().getTime();
+    const token = CryptoUtil.md5(now.toString());
 
-  const newCust = {
-    username, password, name, phone, email, address,
-    token: token,
-    active: 1 // Active immediately since OTP verified
-  };
+    const newCust = {
+      username, password, name, phone, email, address,
+      token: token,
+      active: 1 // Active immediately since OTP verified
+    };
 
-  const result = await CustomerDAO.insert(newCust);
-  delete otpStore[email]; // Clean up
+    const result = await CustomerDAO.insert(newCust);
+    delete otpStore[email]; // Clean up
 
-  if (result) {
-    res.json({ success: true, message: 'Đăng ký thành công! Bạn có thể đăng nhập ngay.' });
-  } else {
-    res.json({ success: false, message: 'Tạo tài khoản thất bại!' });
+    if (result) {
+      res.json({ success: true, message: 'Đăng ký thành công! Bạn có thể đăng nhập ngay.' });
+    } else {
+      res.json({ success: false, message: 'Tạo tài khoản thất bại!' });
+    }
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.json({ success: false, message: 'Đã có lỗi xảy ra khi tạo tài khoản!' });
   }
 });
 
@@ -199,7 +217,7 @@ router.post("/login", async function (req, res) {
 
     if (customer) {
       if (customer.active === 1) {
-        const token = JwtUtil.genToken();
+        const token = JwtUtil.genToken(username, password);
 
         res.json({
           success: true,
