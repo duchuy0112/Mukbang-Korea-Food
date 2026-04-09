@@ -514,17 +514,16 @@ class Signup extends Component {
 
   handleOtpInput(index, e) {
     const raw = e.target.value;
-    // Extract only the last digit typed (prevents duplicates)
-    const match = raw.match(/\d/);
-    const value = match ? match[0] : '';
+    // Get the last digit entered (to allow overwriting)
+    const lastDigit = raw.split('').reverse().find(char => /\d/.test(char)) || '';
 
     const digits = [...this.state.otpDigits];
-    digits[index] = value;
+    digits[index] = lastDigit;
+    
     this.setState({ otpDigits: digits }, () => {
-      // Auto-focus next input after state updates
-      if (value && index < 5) {
+      // Auto-focus next input if a digit was entered
+      if (lastDigit && index < 5) {
         this.otpRefs[index + 1].current.focus();
-        this.otpRefs[index + 1].current.select();
       }
     });
   }
