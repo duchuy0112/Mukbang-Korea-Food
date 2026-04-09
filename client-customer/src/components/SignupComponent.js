@@ -383,8 +383,8 @@ class Signup extends Component {
 
 
           <div className="visual-content">
-            <div className="visual-label">THE FESTIVE CURATOR</div>
-            <h2 className="visual-title">Mukbang Korea</h2>
+            <div className="visual-label"></div>
+            <h2 className="visual-title">Mukbang Store</h2>
             <p className="visual-desc">
               Trải nghiệm tinh hoa ẩm thực xứ Kim Chi trong không gian sang trọng và ấm cúng.
             </p>

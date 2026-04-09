@@ -14,8 +14,35 @@ class Mycart extends Component {
       txtPhone: undefined,
       txtAddress: undefined,
       txtNote: '',
-      payMethod: 'COD' // 'COD' | 'MOMO' | 'BANK'
+      payMethod: 'COD',
+      orders: [],
+      selectedOrder: null,
+      ohOpen: false
     };
+  }
+
+  componentDidMount() {
+    if (this.context.customer) {
+      this.apiGetOrders(this.context.customer._id);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const prevCustomer = this._prevCustomer;
+    const curCustomer = this.context.customer;
+    if (curCustomer && (!prevCustomer || prevCustomer._id !== curCustomer._id)) {
+      this.apiGetOrders(curCustomer._id);
+    }
+    this._prevCustomer = curCustomer;
+  }
+
+  apiGetOrders(cid) {
+    const config = { headers: { 'x-access-token': this.context.token } };
+    axios.get('/api/customer/orders/customer/' + cid, config).then((res) => {
+      const orders = res.data || [];
+      orders.sort((a, b) => (b.cdate || 0) - (a.cdate || 0));
+      this.setState({ orders });
+    }).catch(() => {});
   }
 
   updateQty(id, delta) {
@@ -86,11 +113,32 @@ class Mycart extends Component {
       if (res.data) {
         alert('CHÚC MỪNG! ĐẶT HÀNG THÀNH CÔNG 🎉\n' + (this.state.payMethod !== 'COD' ? '' : 'Vui lòng chuẩn bị tiền mặt khi nhận hàng.'));
         this.context.setMycart([]);
+        if (this.context.customer) {
+          this.apiGetOrders(this.context.customer._id);
+        }
         this.props.navigate('/home');
       } else {
         alert('CÓ LỖI XẢY RA, VUI LÒNG THỬ LẠI!');
       }
     });
+  }
+
+  getStatusLabel(status) {
+    switch (status) {
+      case 'PENDING': return 'Đang xử lý';
+      case 'APPROVED': return 'Đã giao';
+      case 'CANCELED': return 'Đã hủy';
+      default: return status;
+    }
+  }
+
+  getStatusClass(status) {
+    switch (status) {
+      case 'PENDING': return 'oh-status-pending';
+      case 'APPROVED': return 'oh-status-approved';
+      case 'CANCELED': return 'oh-status-canceled';
+      default: return '';
+    }
   }
 
   render() {
@@ -105,7 +153,7 @@ class Mycart extends Component {
           .mukbang-checkout {
             background-color: #faf7f2;
             min-height: 100vh;
-            padding: 60px 5%;
+            padding: 60px 3%;
             font-family: 'Inter', sans-serif;
             color: #333;
           }
@@ -124,6 +172,78 @@ class Mycart extends Component {
             gap: 40px;
             align-items: start;
           }
+
+          /* ============ FLOATING TOGGLE BUTTON ============ */
+          .oh-fab {
+            position: fixed;
+            right: 24px;
+            bottom: 32px;
+            z-index: 1100;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b35, #d32f2f);
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(211,47,47,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.35s cubic-bezier(.4,0,.2,1);
+          }
+          .oh-fab:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 40px rgba(211,47,47,0.45);
+          }
+          .oh-fab-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #fff;
+            color: #b01e1e;
+            font-size: 11px;
+            font-weight: 900;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          }
+
+          /* ============ DRAWER OVERLAY ============ */
+          .oh-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 1200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+          }
+          .oh-overlay.oh-open { opacity: 1; pointer-events: all; }
+
+          /* ============ SLIDE-OUT DRAWER ============ */
+          .oh-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 420px;
+            max-width: 90vw;
+            height: 100vh;
+            z-index: 1300;
+            background: #faf7f2;
+            box-shadow: -10px 0 50px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+            display: flex;
+            flex-direction: column;
+          }
+          .oh-drawer.oh-open { transform: translateX(0); }
 
           /* LEFT: CART ITEMS */
           .section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
@@ -176,21 +296,21 @@ class Mycart extends Component {
           .info-text h4 { font-size: 15px; font-weight: 800; margin-bottom: 5px; }
           .info-text p { font-size: 13px; color: #777; line-height: 1.5; margin: 0; }
 
-          /* RIGHT: PAYMENT INFO */
+          /* CENTER: PAYMENT INFO */
           .payment-card {
             background: #f1ede8;
             border-radius: 24px;
-            padding: 40px;
+            padding: 35px;
           }
-          .pay-title { font-size: 24px; font-weight: 800; margin-bottom: 35px; }
+          .pay-title { font-size: 22px; font-weight: 800; margin-bottom: 30px; }
 
-          .form-group { margin-bottom: 25px; }
+          .form-group { margin-bottom: 22px; }
           .form-label { display: block; font-size: 11px; font-weight: 800; color: #888; margin-bottom: 10px; letter-spacing: 0.5px; }
           .pay-input {
             width: 100%;
             border: none;
             background: #fff;
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-radius: 12px;
             font-size: 14px;
             outline: none;
@@ -199,10 +319,10 @@ class Mycart extends Component {
           .pay-input:focus { box-shadow: 0 0 0 2px #e25a36; }
 
           .pay-method-title { font-size: 11px; font-weight: 800; color: #888; margin-bottom: 15px; text-transform: uppercase; }
-          .method-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+          .method-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
           .method-item {
             background: #fff;
-            padding: 15px 20px;
+            padding: 13px 18px;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -217,16 +337,16 @@ class Mycart extends Component {
           .method-item.active .radio-indicator { border-color: #b01e1e; background: #b01e1e; box-shadow: inset 0 0 0 3px #fffcfb; }
 
           .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; color: #666; font-size: 14px; }
-          .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 30px; }
+          .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; margin-bottom: 25px; }
           .total-lbl { font-size: 18px; font-weight: 800; color: #1a1a1a; }
-          .total-val { font-size: 32px; font-weight: 900; color: #b01e1e; }
+          .total-val { font-size: 28px; font-weight: 900; color: #b01e1e; }
 
           .confirm-btn {
             width: 100%;
             background: #b01e1e;
             color: #fff;
             border: none;
-            padding: 20px;
+            padding: 18px;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 800;
@@ -239,14 +359,14 @@ class Mycart extends Component {
           }
           .confirm-btn:hover { background: #8e1818; transform: translateY(-2px); }
 
-          .safety-tag { text-align: center; font-size: 10px; font-weight: 800; color: #aaa; margin-top: 25px; letter-spacing: 1px; text-transform: uppercase; }
+          .safety-tag { text-align: center; font-size: 10px; font-weight: 800; color: #aaa; margin-top: 20px; letter-spacing: 1px; text-transform: uppercase; }
 
           /* QR SECTION */
           .qr-section {
             background: #fff;
             border-radius: 16px;
             padding: 24px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
             border: 2px dashed #d88960;
             animation: fadeIn 0.4s ease;
@@ -262,8 +382,330 @@ class Mycart extends Component {
           }
           .qr-bank-info b { color: #333; }
 
+          /* ============ DRAWER INNER ============ */
+          .oh-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            border-bottom: 2px solid #f0ebe5;
+            flex-shrink: 0;
+          }
+
+          .oh-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+
+          .oh-title-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b35, #d32f2f);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+          }
+
+          .oh-drawer-close {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: #f5f0eb;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.25s;
+          }
+
+          .oh-drawer-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+          }
+
+          .oh-count-chip {
+            background: #f5f0eb;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #b01e1e;
+          }
+
+          .oh-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+          }
+
+          .oh-scroll::-webkit-scrollbar { width: 4px; }
+          .oh-scroll::-webkit-scrollbar-track { background: transparent; }
+          .oh-scroll::-webkit-scrollbar-thumb { background: #e0d5ca; border-radius: 10px; }
+
+          .oh-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+          }
+
+          .oh-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 10px 0 0 10px;
+            transition: 0.3s;
+          }
+
+          .oh-card-pending::before { background: #f59e0b; }
+          .oh-card-approved::before { background: #22c55e; }
+          .oh-card-canceled::before { background: #ef4444; }
+
+          .oh-card:hover {
+            border-color: #e8ddd2;
+            transform: translateX(3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+          }
+
+          .oh-card.oh-selected {
+            border-color: #d88960;
+            background: #fffcf9;
+            box-shadow: 0 8px 25px rgba(216,137,96,0.12);
+          }
+
+          .oh-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+          }
+
+          .oh-order-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 800;
+            color: #b01e1e;
+          }
+
+          .oh-status {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .oh-status-pending { background: #fff7ed; color: #ea580c; }
+          .oh-status-approved { background: #f0fdf4; color: #16a34a; }
+          .oh-status-canceled { background: #fef2f2; color: #dc2626; }
+
+          .oh-card-date {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 12px;
+            font-weight: 600;
+          }
+
+          .oh-items-preview {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+          }
+
+          .oh-item-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+          }
+
+          .oh-item-more {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f0ebe5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #999;
+          }
+
+          .oh-card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .oh-item-count-label {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: 600;
+          }
+
+          .oh-total {
+            font-size: 17px;
+            font-weight: 900;
+            color: #b01e1e;
+          }
+
+          /* Detail overlay */
+          .oh-detail-overlay {
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 2px solid #d88960;
+            animation: ohSlide 0.35s ease-out;
+          }
+
+          @keyframes ohSlide {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 600px; }
+          }
+
+          .oh-detail-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #b01e1e;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .oh-detail-close {
+            background: #f5f0eb;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+          }
+
+          .oh-detail-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+          }
+
+          .oh-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f0eb;
+          }
+
+          .oh-detail-item:last-child { border-bottom: none; }
+
+          .oh-detail-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+          }
+
+          .oh-detail-info { flex: 1; }
+
+          .oh-detail-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a1a;
+          }
+
+          .oh-detail-qty {
+            font-size: 11px;
+            color: #999;
+          }
+
+          .oh-detail-price {
+            font-size: 13px;
+            font-weight: 800;
+            color: #e25a36;
+          }
+
+          .oh-detail-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px dashed #f0ebe5;
+          }
+
+          .oh-detail-total-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #666;
+          }
+
+          .oh-detail-total-val {
+            font-size: 18px;
+            font-weight: 900;
+            color: #b01e1e;
+          }
+
+          .oh-empty {
+            text-align: center;
+            padding: 40px 15px;
+            color: #ccc;
+          }
+
+          .oh-empty-icon { font-size: 40px; margin-bottom: 12px; }
+          .oh-empty-text { font-size: 14px; font-weight: 700; color: #bbb; margin-bottom: 5px; }
+          .oh-empty-sub { font-size: 12px; color: #ddd; }
+
+          .oh-login-prompt {
+            text-align: center;
+            padding: 60px 25px;
+          }
+
+          .oh-login-prompt-icon { font-size: 44px; margin-bottom: 15px; }
+          .oh-login-prompt-text { font-size: 15px; font-weight: 700; color: #999; margin-bottom: 18px; }
+
+          .oh-login-btn {
+            background: linear-gradient(135deg, #ff6b35, #d32f2f);
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+          }
+
+          .oh-login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(211,47,47,0.3); }
+
           @media (max-width: 900px) {
             .checkout-grid { grid-template-columns: 1fr; }
+            .oh-drawer { width: 100vw; max-width: 100vw; }
           }
         `}</style>
 
@@ -272,7 +714,7 @@ class Mycart extends Component {
           <p className="sub-heading">Hoàn tất hành trình ẩm thực Hàn Quốc của bạn.</p>
 
           <div className="checkout-grid">
-            {/* LEFT COLUMN */}
+            {/* LEFT COLUMN - Cart Items */}
             <div className="cart-side">
               <div className="section-title-row">
                 <h2 className="section-title">Giỏ hàng của bạn</h2>
@@ -324,7 +766,7 @@ class Mycart extends Component {
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
+            {/* CENTER COLUMN - Payment */}
             <div className="pay-side">
               <div className="payment-card">
                 <h2 className="pay-title">Thông tin thanh toán</h2>
@@ -412,7 +854,6 @@ class Mycart extends Component {
                   <div className="qr-section">
                     <span className="qr-title">Thanh toán MoMo</span>
                     <p className="qr-desc">Quét mã để thanh toán qua ứng dụng Ví MoMo</p>
-                    {/* Placeholder MoMo QR - trong thực tế sẽ là QR động từ Gateway */}
                     <img
                       src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=2|99|0901234567|MUKBANG%20KOREA|contact@mukbang.vn|0|0|50000"
                       alt="MoMo QR"
@@ -446,6 +887,112 @@ class Mycart extends Component {
                 </button>
 
                 <div className="safety-tag">BẢO MẬT & AN TOÀN TUYỆT ĐỐI</div>
+              </div>
+            </div>
+
+            {/* FLOATING ORDER BUTTON */}
+            <button className="oh-fab" onClick={() => this.setState({ ohOpen: true })}>
+              📋
+              {this.state.orders.length > 0 && (
+                <span className="oh-fab-badge">{this.state.orders.length}</span>
+              )}
+            </button>
+
+            {/* DRAWER OVERLAY */}
+            <div
+              className={`oh-overlay ${this.state.ohOpen ? 'oh-open' : ''}`}
+              onClick={() => this.setState({ ohOpen: false, selectedOrder: null })}
+            />
+
+            {/* DRAWER */}
+            <div className={`oh-drawer ${this.state.ohOpen ? 'oh-open' : ''}`}>
+              <div className="oh-drawer-header">
+                <div className="oh-title">
+                  <div className="oh-title-icon">📋</div>
+                  <span>Đơn đã đặt</span>
+                  {this.state.orders.length > 0 && (
+                    <span className="oh-count-chip">{this.state.orders.length} đơn</span>
+                  )}
+                </div>
+                <button className="oh-drawer-close" onClick={() => this.setState({ ohOpen: false, selectedOrder: null })}>✕</button>
+              </div>
+
+              <div className="oh-scroll">
+                {!this.context.customer ? (
+                  <div className="oh-login-prompt">
+                    <div className="oh-login-prompt-icon">🔒</div>
+                    <p className="oh-login-prompt-text">Đăng nhập để xem đơn hàng</p>
+                    <button className="oh-login-btn" onClick={() => { this.setState({ ohOpen: false }); this.props.navigate('/login'); }}>
+                      Đăng nhập ngay
+                    </button>
+                  </div>
+                ) : this.state.orders.length === 0 ? (
+                  <div className="oh-empty">
+                    <div className="oh-empty-icon">📭</div>
+                    <p className="oh-empty-text">Chưa có đơn hàng nào</p>
+                    <p className="oh-empty-sub">Đơn hàng sẽ hiển thị ở đây sau khi bạn đặt</p>
+                  </div>
+                ) : (
+                  this.state.orders.map((order) => (
+                    <React.Fragment key={order._id}>
+                      <div
+                        className={`oh-card oh-card-${(order.status || 'pending').toLowerCase()} ${this.state.selectedOrder?._id === order._id ? 'oh-selected' : ''}`}
+                        onClick={() => this.setState({ selectedOrder: this.state.selectedOrder?._id === order._id ? null : order })}
+                      >
+                        <div className="oh-card-top">
+                          <span className="oh-order-id">#{order._id.substring(order._id.length - 8)}</span>
+                          <span className={`oh-status ${this.getStatusClass(order.status)}`}>
+                            {this.getStatusLabel(order.status)}
+                          </span>
+                        </div>
+                        <div className="oh-card-date">
+                          {new Date(order.cdate).toLocaleString('vi-VN')}
+                        </div>
+                        <div className="oh-items-preview">
+                          {order.items && order.items.slice(0, 4).map((it, i) => (
+                            <img
+                              key={i}
+                              src={"data:image/jpg;base64," + it.product.image}
+                              alt=""
+                              className="oh-item-thumb"
+                            />
+                          ))}
+                          {order.items && order.items.length > 4 && (
+                            <div className="oh-item-more">+{order.items.length - 4}</div>
+                          )}
+                        </div>
+                        <div className="oh-card-bottom">
+                          <span className="oh-item-count-label">{order.items ? order.items.length : 0} món</span>
+                          <span className="oh-total">{order.total?.toLocaleString()}đ</span>
+                        </div>
+                      </div>
+
+                      {/* Expanded detail */}
+                      {this.state.selectedOrder?._id === order._id && (
+                        <div className="oh-detail-overlay">
+                          <div className="oh-detail-title">
+                            <span>Chi tiết đơn #{order._id.substring(order._id.length - 6)}</span>
+                            <button className="oh-detail-close" onClick={(e) => { e.stopPropagation(); this.setState({ selectedOrder: null }); }}>✕</button>
+                          </div>
+                          {order.items && order.items.map((it, i) => (
+                            <div key={i} className="oh-detail-item">
+                              <img src={"data:image/jpg;base64," + it.product.image} alt="" className="oh-detail-img" />
+                              <div className="oh-detail-info">
+                                <div className="oh-detail-name">{it.product.name}</div>
+                                <div className="oh-detail-qty">x{it.quantity}</div>
+                              </div>
+                              <div className="oh-detail-price">{(it.product.price * it.quantity).toLocaleString()}đ</div>
+                            </div>
+                          ))}
+                          <div className="oh-detail-total-row">
+                            <span className="oh-detail-total-label">Tổng đơn hàng</span>
+                            <span className="oh-detail-total-val">{order.total?.toLocaleString()}đ</span>
+                          </div>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))
+                )}
               </div>
             </div>
           </div>
