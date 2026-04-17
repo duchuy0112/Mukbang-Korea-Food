@@ -3,8 +3,11 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import withRouter from '../utils/withRouter';
 import { Helmet } from 'react-helmet-async';
+import MyContext from '../contexts/MyContext';
 
 class Product extends Component {
+  static contextType = MyContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -13,8 +16,42 @@ class Product extends Component {
       activeCategoryId: 'all',
       loading: true,
       currentPage: 1,
-      itemsPerPage: 6 // Số lượng món ăn trên mỗi trang
+      itemsPerPage: 6,
+      toast: null // { message, type }
     };
+    this.toastTimer = null;
+  }
+
+  showToast(message, type = 'success') {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.setState({ toast: { message, type } });
+    this.toastTimer = setTimeout(() => this.setState({ toast: null }), 3000);
+  }
+
+  addToCart(e, item) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!this.context.token) {
+      this.showToast('Vui lòng đăng nhập để thêm vào giỏ hàng!', 'warn');
+      return;
+    }
+
+    const mycart = [...this.context.mycart];
+    const index = mycart.findIndex(x => x.product._id === item._id);
+
+    if (index === -1) {
+      mycart.push({ product: item, quantity: 1 });
+    } else {
+      mycart[index].quantity += 1;
+    }
+
+    this.context.setMycart(mycart);
+    this.showToast('✓ ' + item.name + ' đã thêm vào giỏ!', 'success');
+  }
+
+  componentWillUnmount() {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
   componentDidMount() {
@@ -130,9 +167,20 @@ class Product extends Component {
               {item.description || "Món ăn chuẩn vị Hàn Quốc, được chế biến tâm huyết bởi đầu bếp chuyên nghiệp."}
             </p>
             <p className="card-price">{item.price?.toLocaleString()} VNĐ</p>
-            <button className="card-add-btn">Thêm vào giỏ</button>
           </div>
         </Link>
+        <button
+          className="card-add-btn"
+          onClick={(e) => this.addToCart(e, item)}
+          title="Thêm vào giỏ hàng"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginRight:'6px'}}>
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          Thêm vào giỏ
+        </button>
       </div>
     ));
 
@@ -150,13 +198,51 @@ class Product extends Component {
       );
     }
 
+    const { toast } = this.state;
+
     return (
       <div className="menu-page-wrapper">
+        {/* TOAST NOTIFICATION */}
+        {toast && (
+          <div className={`cart-toast cart-toast--${toast.type}`}>
+            {toast.message}
+          </div>
+        )}
         <style>{`
           :root {
             --primary-red: #D32F2F;
             --primary-orange: #FF6D00;
             --accent-gradient: linear-gradient(135deg, #FF6D00 0%, #D32F2F 100%);
+          }
+
+          /* ===== TOAST ===== */
+          .cart-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            animation: toastIn 0.4s cubic-bezier(0.4,0,0.2,1);
+            max-width: 360px;
+            line-height: 1.4;
+          }
+          .cart-toast--success {
+            background: linear-gradient(135deg, #FF6D00, #D32F2F);
+            color: #fff;
+          }
+          .cart-toast--warn {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+          }
+          @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
           }
 
           .menu-page-wrapper {
@@ -205,8 +291,22 @@ class Product extends Component {
           .card-price { font-size: 18px; font-weight: 900; color: var(--primary-red); margin-bottom: 18px; }
           
           .card-add-btn {
-            width: 100%; border: none; background: #222; color: #fff; padding: 13px; border-radius: 14px; font-weight: 800; font-size: 13px; transition: 0.3s; cursor: pointer;
+            width: calc(100% - 44px);
+            margin: 0 22px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: #222;
+            color: #fff;
+            padding: 13px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 13px;
+            transition: 0.3s;
+            cursor: pointer;
           }
+          .card-add-btn:hover { background: var(--accent-gradient); transform: translateY(-2px); }
           .menu-product-card:hover .card-add-btn { background: var(--accent-gradient); }
 
           /* --- PAGINATION --- */

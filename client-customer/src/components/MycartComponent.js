@@ -17,8 +17,23 @@ class Mycart extends Component {
       payMethod: 'COD',
       orders: [],
       selectedOrder: null,
-      ohOpen: false
+      ohOpen: false,
+      confirmOpen: false,
+      checkoutLoading: false,
+      toastMsg: null,
+      toastType: 'success'
     };
+    this.toastTimer = null;
+  }
+
+  showToast(msg, type = 'success') {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.setState({ toastMsg: msg, toastType: type });
+    this.toastTimer = setTimeout(() => this.setState({ toastMsg: null }), 3500);
+  }
+
+  componentWillUnmount() {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
   componentDidMount() {
@@ -73,36 +88,42 @@ class Mycart extends Component {
       address: this.state.txtAddress !== undefined ? this.state.txtAddress : (customerContext.address || '')
     };
 
-    if (!customer.address || customer.address.trim() === '') {
-      alert('VUI LÒNG NHẬP ĐỊA CHỈ GIAO HÀNG!');
-      return;
-    }
     if (!customer.name || customer.name.trim() === '') {
-      alert('VUI LÒNG NHẬP HỌ VÀ TÊN!');
-      return;
+      this.showToast('Vui lòng nhập họ và tên!', 'warn'); return;
     }
     if (!customer.phone || customer.phone.trim() === '') {
-      alert('VUI LÒNG NHẬP SỐ ĐIỆN THOẠI!');
-      return;
+      this.showToast('Vui lòng nhập số điện thoại!', 'warn'); return;
+    }
+    if (!customer.address || customer.address.trim() === '') {
+      this.showToast('Vui lòng nhập địa chỉ giao hàng!', 'warn'); return;
+    }
+    if (!this.context.customer) {
+      this.props.navigate('/login'); return;
+    }
+    if (this.context.mycart.length === 0) {
+      this.showToast('Giỏ hàng của bạn đang trống!', 'warn'); return;
     }
 
-    if (window.confirm('XÁC NHẬN THANH TOÁN ĐƠN HÀNG NÀY?')) {
-      if (this.context.mycart.length > 0) {
-        const subtotal = CartUtil.getTotal(this.context.mycart);
-        const shipping = subtotal > 0 ? 30000 : 0;
-        const service = subtotal > 0 ? 15000 : 0;
-        const total = subtotal + shipping + service;
-        const items = this.context.mycart;
+    // Open in-app confirm modal
+    this.setState({ confirmOpen: true });
+  }
 
-        if (this.context.customer) {
-          this.apiCheckout(total, items, customer);
-        } else {
-          this.props.navigate('/login');
-        }
-      } else {
-        alert('Giỏ hàng của bạn đang trống!');
-      }
-    }
+  doCheckout() {
+    const customerContext = this.context.customer || {};
+    const customer = {
+      ...customerContext,
+      name: this.state.txtName !== undefined ? this.state.txtName : (customerContext.name || ''),
+      phone: this.state.txtPhone !== undefined ? this.state.txtPhone : (customerContext.phone || ''),
+      address: this.state.txtAddress !== undefined ? this.state.txtAddress : (customerContext.address || '')
+    };
+
+    const subtotal = CartUtil.getTotal(this.context.mycart);
+    const shipping = subtotal > 0 ? 30000 : 0;
+    const total = subtotal + shipping;
+    const items = this.context.mycart;
+
+    this.setState({ confirmOpen: false, checkoutLoading: true });
+    this.apiCheckout(total, items, customer);
   }
 
   apiCheckout(total, items, customer) {
@@ -110,16 +131,20 @@ class Mycart extends Component {
     const config = { headers: { 'x-access-token': this.context.token } };
 
     axios.post('/api/customer/checkout', body, config).then((res) => {
+      this.setState({ checkoutLoading: false });
       if (res.data) {
-        alert('CHÚC MỪNG! ĐẶT HÀNG THÀNH CÔNG 🎉\n' + (this.state.payMethod !== 'COD' ? '' : 'Vui lòng chuẩn bị tiền mặt khi nhận hàng.'));
         this.context.setMycart([]);
+        this.showToast('🎉 Đặt hàng thành công! Cảm ơn bạn.', 'success');
         if (this.context.customer) {
           this.apiGetOrders(this.context.customer._id);
         }
-        this.props.navigate('/home');
+        setTimeout(() => this.props.navigate('/home'), 2000);
       } else {
-        alert('CÓ LỖI XẢY RA, VUI LÒNG THỬ LẠI!');
+        this.showToast('Có lỗi xảy ra, vui lòng thử lại!', 'error');
       }
+    }).catch(() => {
+      this.setState({ checkoutLoading: false });
+      this.showToast('Lỗi kết nối, vui lòng thử lại!', 'error');
     });
   }
 
@@ -146,10 +171,78 @@ class Mycart extends Component {
     const subtotal = CartUtil.getTotal(mycart);
     const shipping = subtotal > 0 ? 30000 : 0;
     const totalPayable = subtotal + shipping;
+    const { confirmOpen, checkoutLoading, toastMsg, toastType } = this.state;
 
     return (
       <div className="mukbang-checkout">
+        {/* ===== TOAST ===== */}
+        {toastMsg && (
+          <div className={`mc-toast mc-toast--${toastType}`}>{toastMsg}</div>
+        )}
+
+        {/* ===== CONFIRM MODAL ===== */}
+        {confirmOpen && (
+          <div className="mc-modal-overlay" onClick={() => this.setState({ confirmOpen: false })}>
+            <div className="mc-modal" onClick={e => e.stopPropagation()}>
+              <div className="mc-modal-icon">🛒</div>
+              <h3 className="mc-modal-title">Xác nhận đặt hàng</h3>
+              <p className="mc-modal-desc">Bạn có chắc muốn đặt hàng với tổng giá trị <strong>{totalPayable.toLocaleString()}đ</strong>?</p>
+              <div className="mc-modal-actions">
+                <button className="mc-modal-cancel" onClick={() => this.setState({ confirmOpen: false })}>Hủy bỏ</button>
+                <button className="mc-modal-confirm" onClick={() => this.doCheckout()}>✓ Xác nhận</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <style>{`
+          /* ===== TOAST ===== */
+          .mc-toast {
+            position: fixed; bottom: 30px; right: 30px; z-index: 99999;
+            padding: 14px 24px; border-radius: 16px;
+            font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            animation: mcToastIn 0.4s cubic-bezier(0.4,0,0.2,1);
+            max-width: 380px; line-height: 1.5;
+          }
+          .mc-toast--success { background: linear-gradient(135deg,#FF6D00,#D32F2F); color:#fff; }
+          .mc-toast--warn { background:#fff3cd; color:#856404; border:1px solid #ffc107; }
+          .mc-toast--error { background:#fde8e8; color:#b91c1c; border:1px solid #f87171; }
+          @keyframes mcToastIn { from{opacity:0;transform:translateY(20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+
+          /* ===== CONFIRM MODAL ===== */
+          .mc-modal-overlay {
+            position: fixed; inset: 0; z-index: 99998;
+            background: rgba(0,0,0,0.45);
+            display: flex; align-items: center; justify-content: center;
+            animation: mcFadeIn 0.25s ease;
+          }
+          @keyframes mcFadeIn { from{opacity:0} to{opacity:1} }
+          .mc-modal {
+            background: #fff; border-radius: 28px; padding: 40px 36px;
+            max-width: 420px; width: 90%; text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+            animation: mcSlideUp 0.3s cubic-bezier(0.4,0,0.2,1);
+          }
+          @keyframes mcSlideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+          .mc-modal-icon { font-size: 48px; margin-bottom: 16px; }
+          .mc-modal-title { font-size: 22px; font-weight: 900; color: #1a1a1a; margin-bottom: 10px; }
+          .mc-modal-desc { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 30px; }
+          .mc-modal-actions { display: flex; gap: 12px; }
+          .mc-modal-cancel {
+            flex: 1; padding: 14px; border: 2px solid #eee; background: #fff;
+            border-radius: 14px; font-size: 15px; font-weight: 700;
+            cursor: pointer; transition: 0.2s; color: #666;
+          }
+          .mc-modal-cancel:hover { background: #f5f5f5; border-color: #ddd; }
+          .mc-modal-confirm {
+            flex: 1.5; padding: 14px; border: none;
+            background: linear-gradient(135deg, #FF6D00, #D32F2F);
+            color: #fff; border-radius: 14px; font-size: 15px; font-weight: 800;
+            cursor: pointer; transition: 0.3s;
+          }
+          .mc-modal-confirm:hover { filter: brightness(1.08); transform: translateY(-2px); }
+
           .mukbang-checkout {
             background-color: #faf7f2;
             min-height: 100vh;
@@ -882,9 +975,22 @@ class Mycart extends Component {
                   </div>
                 </div>
 
-                <button className="confirm-btn" onClick={() => this.lnkCheckoutClick()}>
-                  Xác nhận thanh toán <span>➔</span>
+                <button
+                  className="confirm-btn"
+                  onClick={() => this.lnkCheckoutClick()}
+                  disabled={checkoutLoading}
+                  style={checkoutLoading ? { opacity: 0.7, cursor: 'not-allowed' } : {}}
+                >
+                  {checkoutLoading ? (
+                    <span style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+                      <span style={{ width:'18px', height:'18px', border:'3px solid rgba(255,255,255,0.4)', borderTopColor:'#fff', borderRadius:'50%', display:'inline-block', animation:'spin 0.7s linear infinite' }} />
+                      Đang xử lý...
+                    </span>
+                  ) : (
+                    <span>Xác nhận thanh toán ➔</span>
+                  )}
                 </button>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
                 <div className="safety-tag">BẢO MẬT & AN TOÀN TUYỆT ĐỐI</div>
               </div>

@@ -74,7 +74,7 @@ class Main extends Component {
 
           /* ============ HEADER ============ */
           .header-main-sticky {
-            position: sticky; top: 0; z-index: 1000;
+            position: sticky; top: 0; z-index: 9999;
             background: #fdfaf6;
             display: flex;
             align-items: center;
